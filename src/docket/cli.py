@@ -25,6 +25,16 @@ def build_parser() -> argparse.ArgumentParser:
 
     sub.add_parser("status", help="the glance — derived state of every clause")
 
+    sub.add_parser("audit", help="coverage views — incompleteness made inspectable")
+
+    tsk = sub.add_parser("tasks", help="derived task view: clause minus evidence")
+    tsk.add_argument("--next", action="store_true")
+    tsk.add_argument("--json", action="store_true")
+
+    fil = sub.add_parser("file", help="file an evidence bundle (append-only)")
+    fil.add_argument("clause")
+    fil.add_argument("--bundle", type=Path, required=True)
+
     return p
 
 
@@ -33,7 +43,8 @@ def main(argv: list[str] | None = None) -> int:
     if args.cmd is None:
         print("docket: no command given (try: docket status)", file=sys.stderr)
         return 2
-    return {"import": cmd_import, "check": cmd_check, "status": cmd_status}[args.cmd](args)
+    return {"import": cmd_import, "check": cmd_check, "status": cmd_status,
+            "audit": cmd_audit, "tasks": cmd_tasks, "file": cmd_file}[args.cmd](args)
 
 
 def cmd_import(args) -> int:
@@ -148,6 +159,85 @@ def cmd_status(args) -> int:
     for contract in contracts:
         views = derive_views(contract, led, args.root)
         print(status_report(contract, views, freshness(views)))
+    return 0
+
+
+def cmd_audit(args) -> int:
+    from docket.render import audit_report
+    from docket.state import derive_views
+    from docket.storage import Ledger
+    led = Ledger(args.root)
+    for contract in led.contracts():
+        print(audit_report(contract, derive_views(contract, led, args.root),
+                           led.coverage_manifest()))
+    return 0
+
+
+def cmd_tasks(args) -> int:
+    import json as _json
+    from docket.state import derive_views
+    from docket.storage import Ledger
+    led = Ledger(args.root)
+    todo = []
+    for contract in led.contracts():
+        for v in derive_views(contract, led, args.root):
+            if v.state in ("unstarted", "broken", "pending-harness", "stale"):
+                todo.append((contract, v))
+    if not todo:
+        print("docket clear — every active clause is holding or awaiting verdict")
+        return 0
+    if args.next:
+        contract, v = todo[0]
+        if args.json:
+            bundles = led.records(v.clause.id, "bundle")
+            print(_json.dumps({
+                "clause": v.clause.id,
+                "obligation": v.clause.obligation.strip(),
+                "acceptance": v.clause.acceptance.model_dump(exclude_none=True),
+                "rev": contract.rev,
+                "filed_evidence": [b["_file"] for b in bundles],
+            }))
+        else:
+            print(f"{v.clause.id} [{v.state}] {v.clause.obligation.strip()[:90]}")
+        return 0
+    for contract, v in todo:
+        print(f"{v.clause.id} [{v.state}] {v.clause.obligation.strip()[:90]}")
+    return 0
+
+
+def cmd_file(args) -> int:
+    import json as _json
+    from docket.storage import Ledger
+    led = Ledger(args.root)
+    try:
+        payload = _json.loads(Path(args.bundle).read_text())
+    except Exception as e:
+        print(f"docket file: malformed bundle — {e}", file=sys.stderr)
+        return 2
+    required = {"clause", "claim", "filed_by", "rev_at_filing", "evidence"}
+    if not required <= set(payload):
+        print(f"docket file: malformed bundle — missing {sorted(required - set(payload))}",
+              file=sys.stderr)
+        return 2
+    target = None
+    for contract in led.contracts():
+        for clause in contract.clauses:
+            if clause.id == args.clause:
+                target = (contract, clause)
+    if target is None:
+        print(f"docket file: unknown clause {args.clause}", file=sys.stderr)
+        return 2
+    contract, clause = target
+    if payload["rev_at_filing"] != contract.rev:
+        print(f"docket file: rev mismatch — bundle filed against rev "
+              f"{payload['rev_at_filing']}, law is rev {contract.rev}. refile.",
+              file=sys.stderr)
+        return 2
+    if payload["claim"] == "stuck" and "stuck_on" not in payload:
+        print("docket file: a failure report needs stuck_on", file=sys.stderr)
+        return 2
+    p = led.append_record(args.clause, "bundle", payload)
+    print(f"✔ filed → review queue (status: ⚖) · {p.relative_to(args.root)}")
     return 0
 
 

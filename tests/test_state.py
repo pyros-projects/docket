@@ -1,7 +1,5 @@
 import hashlib
 
-import pytest
-
 from tests.conftest import run_cli, write_history
 from docket.state import derive_views
 from docket.storage import Ledger
@@ -74,7 +72,6 @@ def test_stale_after_amendment_invalidates(ledger_root):
     assert _views(ledger_root)["C-001"].state == "stale"
 
 
-@pytest.mark.xfail(reason="status/audit/tasks land in Tasks 9-10", strict=False)
 def test_no_stored_state(ledger_root, capsys):
     """D0-002: read surfaces write nothing; no state key persists; derivation is pure."""
     (ledger_root / "tests").mkdir(); (ledger_root / "tests/test_demo.py").write_text("x = 1\n")
