@@ -84,3 +84,12 @@ def test_import_cross_contract_id_collision_refused(ledger_root, capsys, tmp_pat
     assert code == 0                      # C-900 still admitted
     assert "admitted: 1" in out
     assert re.search(r"✘ C-001 \[A7\].*already law.*demo", out)
+
+
+def test_tipsy_pressure_bundle_imports_clean(tmp_path, capsys):
+    tipsy = REPO / "docs/dojo/runs/pressure-tipsy/tipsy/.contracts/tipsy.contract.yaml"
+    (tmp_path / ".contracts").mkdir()
+    code, out, err = run_cli(["import", str(tipsy)], tmp_path, capsys)
+    assert code == 0
+    assert "admitted: 16" in out
+    assert "refused: 0" in out
