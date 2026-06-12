@@ -1,15 +1,13 @@
 ---
 name: surface-first-development
-description: This skill should be used when the user wants to build, prototype, or reshape an app, tool, CLI, API, automation, or feature by starting from the interaction surface first. Responds to "let's build", "prototype this", "I have an idea for an app/tool", "show me what it would look like", "surface first", "SFD", "click dummy", "what would the UX be", "what would the workflow look like", or any request where the user describes what something should do without specifying architecture. Converges on a working prototype before deriving contracts and building inward.
+description: This skill should be used when the user wants to build, prototype, or reshape an app, tool, CLI, API, automation, or feature by starting from the interaction surface first. Responds to "let's build", "prototype this", "I have an idea for an app/tool", "show me what it would look like", "surface first", "SFD", "click dummy", "derive contracts", "docket contracts", "what would the UX be", or any request where the user describes what something should do without specifying architecture. Converges on a working prototype, then emits docket-admissible contracts — clause log during iteration, surface state inventory, .contracts/*.contract.yaml, self-admission against the Accord door checks (A1–A9), round-trip sufficiency test, and a seven-artifact Handoff Bundle.
 ---
 
 # Surface-First Development
 
 ## Reference
 
-If anything in this skill feels unclear, underspecified, or in tension with a real project situation, stop and read [references/whitepaper-v0.6.md](references/whitepaper-v0.6.md) before improvising. Treat that whitepaper as the authoritative reference for the methodology.
-
-If this `SKILL.md` and the whitepaper ever feel misaligned, follow the whitepaper and then update the skill so the drift is removed.
+If anything in this skill feels unclear, underspecified, or in tension with a real project situation, stop and read [references/whitepaper-v0.6.md](references/whitepaper-v0.6.md) before improvising. Treat that whitepaper as the authoritative reference for the methodology — EXCEPT for contract derivation and handoff (Phases 4.5–5.5, Gates 1–2): this copy is the **docket-emitting variant** (see UPSTREAM.md), and for everything contract-shaped, [references/contract-emission.md](references/contract-emission.md) supersedes the whitepaper's v0.6 wording. The whitepaper describes prose contract derivation; the variant emits machine-admissible contract YAML.
 
 ## Triggers
 
@@ -174,6 +172,15 @@ The user will critique the prototype. Your job:
 2. **Ignore implementation preferences** unless the user insists. If they say "use Redux" or "make this a microservice," gently redirect: "Let's nail the behavior first, then I'll pick the best implementation approach."
 3. **Probe edge cases yourself.** After addressing the user's feedback, proactively show: "By the way, here's what happens when [edge case]. Does this feel right?"
 4. **Track decisions.** Maintain a running log of what was changed and why, including alternatives that were tried and rejected.
+5. **Log clauses at birth.** Every accepted behavioral expectation IS a contract clause in larval form. The moment the user accepts a behavior (or rejects an alternative), append an entry to `.sfd/clause-log.md` — do NOT wait for Phase 5 and try to remember. Entry format:
+
+```markdown
+- [C-007] Tips MUST be rounded to the nearest $0.10, ties up.
+  born: iteration round 1, in response to "tips should be rounded to the nearest 10 cents"
+  state-cells: calculate × happy-path
+```
+
+   `C-NNN` ids are per-project monotonic and survive into the contract file unchanged. Rejected alternatives get logged too, phrased as MUST NOT (e.g. "the tool MUST NOT read stdin"), with `born:` pointing at the rejection. Retrospective derivation is the biggest quality loss in this pipeline — the clause log is how the variant avoids it.
 
 **Convergence check:** After each iteration round, ask:
 
@@ -183,18 +190,25 @@ When the user says something like "this feels right," "let's build it," "I'm hap
 
 > "Surface converged. Moving to contract derivation."
 
-### Phase 5: Derive Contracts
+### Phase 4.5: Surface State Inventory (Gate 1 prerequisite)
 
-Before writing any backend/internal code, extract what the converged surface demands:
+Timing: after the user's freeze signal ("this feels right"), before declaring Gate 1 passed. Classify every observable state of every surface unit (screen, command, endpoint, workflow step) as **in-scope** (demonstrated and accepted), **deferred** (acknowledged, not blocking), or **n/a**. The ten states per unit: empty/zero-data, loading/in-progress, success, validation failure, system failure, partial failure, permission denied, conflict, rate limit/retry, offline/degraded. Write it to `.sfd/surface-state-inventory.md`. A prototype that only shows the happy path has not converged — it has demonstrated one path through a larger state space.
 
-1. **API contracts:** List every data operation the surface performs. What endpoints, methods, payloads, and error shapes are implied?
-2. **Domain rules:** What business logic must be true for the surface behavior to remain valid? (e.g., "a goal can only be marked overdue if its deadline has passed and it's not complete")
-3. **Non-functional requirements:** Does the surface imply real-time updates? Offline capability? Sub-second response times?
-4. **Acceptance criteria:** Translate the converged surface flows into testable assertions.
+### Phase 5: Compile Contracts (from the Clause Log, not from memory)
 
-Present these to the user for confirmation:
+The contracts are THE PRODUCT of this methodology — the prototype was the interview instrument. Phase 5 is compile-and-dedup, not recall:
 
-> "Based on the converged surface, here are the contracts the backend needs to fulfill: [list]. Does this capture everything? Anything I'm missing?"
+1. **Compile:** walk `.sfd/clause-log.md`; merge duplicates; sharpen wording. Walk the decision log's rejected alternatives — strong rejections become MUST NOT clauses (the user paid to reject them once; they must never need re-rejecting).
+2. **Cover:** every in-scope cell of the Surface State Inventory maps to ≥1 clause, and every clause cites its cells in `anchors`. Uncovered in-scope cells are bugs in the compilation; fix or reclassify.
+3. **Make checkable at birth:** every clause gets exactly one RFC-2119 keyword (MUST or MUST NOT — never SHOULD: decide or defer) and a typed `acceptance:` — `test:` ref, `metric:` + `threshold:`, `command:` + `expect:`, or `verdict: human` (legal, but explicit). A clause you cannot give an acceptance procedure is not a contract — demote it to the open-questions list. Qualitative performance words ("fast", "reliable") get numbers or get demoted.
+4. **Emit:** write `.contracts/<project>.contract.yaml` exactly per the schema in [references/contract-emission.md](references/contract-emission.md) — top-level `contract`/`rev`/`source`/`signed`, clauses with `id`/`obligation`/`acceptance`/`anchors` (optional `risk`/`evidence_required`/`scope`). Clause ids come from the clause log unchanged.
+5. **Confirm via options, not open questions:** for each genuinely contested clause (strict vs loose invariant, tight vs generous threshold), present 2-3 options with your recommendation — the Propose-Choose-Proceed rule applies to contracts too. Never ask "does this capture everything?"; the inventory coverage check answers that structurally.
+
+### Phase 5.5: Self-Admission and Round-Trip (Gate 2 prerequisites)
+
+**Self-admission (the Accord):** walk the door checks A1–A9 over your own drafted YAML, as if you were the ledger refusing your work — the full checklist with refuse/flag semantics is in [references/contract-emission.md](references/contract-emission.md). Fix every refusal at the source; record flags honestly. A handoff bundle whose contract file would be refused at a docket door is not done.
+
+**Round-trip test:** contracts are sufficient iff a blind agent can rebuild the surface from them. Hand the contract YAML + state inventory ONLY (not the prototype, not the conversation) to a fresh-context subagent; have it reconstruct the surface at wireframe/session-transcript fidelity; diff against the converged prototype. Divergence = a contract leak → tighten or add a clause. Max 2 rounds; remaining cosmetic-only diffs are accepted and noted. Write `.sfd/round-trip-report.md`. (No subagent tooling available? Do a documented self-blind reconstruction — write the rebuild from the YAML alone before re-opening the prototype — and mark the report `mode: self-blind`.)
 
 ### Phase 6: Build Inward (Vertical Slices)
 
@@ -221,13 +235,21 @@ After each hardening step, verify the surface still behaves as converged.
 
 ---
 
+## Canonical Artifact Paths (no improvising)
+
+Every SFD project uses exactly these paths — the Handoff Bundle depends on them:
+
+- `.sfd/intent.md` — intent document (Phase 1: problem statement, target users, constraints, non-negotiables, known unknowns)
+- `.sfd/decision-log.md` — decision log (Phase 4)
+- `.sfd/clause-log.md` — clause log (Phase 4, rule 5)
+- `.sfd/surface-state-inventory.md` — state inventory (Phase 4.5)
+- `.sfd/round-trip-report.md` — round-trip report (Phase 5.5)
+- `.contracts/<project>.contract.yaml` — THE contract file (Phase 5)
+- `prototype/` — the converged surface prototype (form varies by surface type)
+
 ## Decision Log Format
 
 Maintain this throughout the project. It survives sessions and prevents re-litigating settled decisions.
-
-Use this canonical file path for the decision log:
-
-- `.sfd/decision-log.md`
 
 ```markdown
 ## SFD Decision Log
@@ -263,14 +285,20 @@ Use these gates to track progress. Don't skip gates.
 ### Gate 1: Surface Converged
 - [ ] Critical flows demonstrated and accepted by user
 - [ ] Edge cases explored interactively
+- [ ] Surface State Inventory complete — every unit × state classified in-scope / deferred / n/a
 - [ ] Decision log captures key choices and rejected alternatives
+- [ ] Clause log current — every accepted behavior has a C-NNN entry
 - [ ] Open UX questions logged (if any)
 
-### Gate 2: Contracts Frozen
-- [ ] API contracts documented
-- [ ] Domain invariants identified
-- [ ] Non-functional requirements specified with targets
-- [ ] User confirmed contracts match surface expectations
+### Gate 2: Contracts Frozen (= Handoff Bundle complete)
+- [ ] `.contracts/<project>.contract.yaml` emitted per schema; every clause: one MUST/MUST NOT, typed acceptance, ≥1 anchor citing inventory cells or decisions
+- [ ] Every in-scope inventory cell maps to ≥1 clause
+- [ ] NFRs carry numbers (or live in open questions, not in the contract)
+- [ ] Self-admission walk (A1–A9) clean — refusals fixed, flags recorded
+- [ ] Round-trip report filed; remaining diffs cosmetic-only
+- [ ] Contested clauses confirmed via options (Propose-Choose-Proceed)
+- [ ] Handoff Bundle complete: intent, prototype, decision log, clause log, state inventory, contract YAML, round-trip report
+- [ ] User signed the rev (`signed:` entry in the contract file)
 
 ### Gate 3: Architecture Review
 - [ ] Tech stack confirmed
@@ -299,6 +327,7 @@ Use these gates to track progress. Don't skip gates.
 4. **Don't throw away the prototype.** Harden it. If a full rewrite is truly needed, the converged surface is still the behavioral reference.
 5. **Don't gold-plate the prototype.** Fast and opinionated beats slow and polished. The user will fix what's wrong.
 6. **Don't ask open-ended questions.** Present options, don't ask the user to design. "Which of these three directions?" is good. "What do you want it to look like?" is bad. The user steers; you generate.
+7. **Don't build a second spec reality.** The contract file plus the decision log ARE the spec. Never produce a parallel prose-requirements document that restates the contracts — abstract documents drift and quietly outrank the artifact people actually validated. If something can't live in a clause, it belongs in the decision log (why) or open questions (undecided) — nowhere else.
 
 ---
 
@@ -317,30 +346,24 @@ In these cases, say:
 
 ---
 
-## Integration with Other Skills
+## Export (after Gate 2)
 
-### With OpenSpec
-After Gate 1 (surface converged), export the converged state and contracts as an OpenSpec artifact. This gives the project persistent, structured context that survives session boundaries.
+The Handoff Bundle is the deliverable; everything downstream consumes it generically:
 
-### With Beads
-After Gate 2 (contracts frozen), create Beads tasks for each vertical slice and hardening step. This gives you a persistent task tracker that survives context compaction and session switches.
-
-### Workflow
 ```
-SFD Phase 1-4 (discover + research + prototype + converge)
+SFD Phase 1-5.5 (discover + converge + compile + admit)
     |
     v
-Gate 1 --> OpenSpec: capture converged surface + contracts
+Gate 2 --> Handoff Bundle (.sfd/* + .contracts/<project>.contract.yaml)
     |
     v
-Gate 2 --> Beads: create tasks for slices + hardening
+contract ledger (e.g. docket import) -> derived tasks -> evidence bundles
     |
     v
-SFD Phase 6-7 (build + harden, tracked in Beads)
-    |
-    v
-Gates 3-5 (review, verify, release)
+SFD Phase 6-7, or any other fulfillment process -- the bundle doesn't care
 ```
+
+Do not build integration code for any specific consumer. The contract file is a boundary artifact: ledgers import it, loop runners use clauses as stop conditions, task systems derive work from obligation-minus-evidence. Tool-specific exports (OpenSpec, Beads, ...) are legal as *additional* views but must never become the primary spec — see Anti-Pattern 7.
 
 ---
 
@@ -362,8 +385,9 @@ Use this mental loop throughout the session:
 3. Am I about to make a directional choice? (If yes → Propose-Choose-Proceed)
 4. What is the smallest artifact that makes it real enough to critique?
 5. What did the user react to?
-6. What contract does that reaction imply?
-7. What is the next thin slice inward?
+6. What clause does that reaction imply? Log it NOW (`.sfd/clause-log.md`).
+7. Would this clause pass the Accord (typed acceptance? anchor? one MUST?)
+8. What is the next thin slice inward?
 
 ## End of Session Protocol
 

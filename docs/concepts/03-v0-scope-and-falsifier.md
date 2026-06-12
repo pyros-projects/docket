@@ -90,12 +90,12 @@ clauses:
 
   - id: D0-007
     obligation: >
-      The flock feat/skills .sfd/contracts.md MUST import with zero manual
-      reformatting beyond clause-ification, with every refusal naming its
-      door check.
-    acceptance: {command: "docket import fixtures/flock-skills.contract.yaml",
-                 expect: "exit 0, ≥8 admitted, refusals each cite A1–A7"}
-    anchors: [{compat: flock-feat-skills-sfd-artifacts}]
+      A handoff bundle produced by the docket-emitting SFD variant
+      (.agents/skills/surface-first-development/) MUST import with zero
+      manual reformatting, with every refusal naming its door check.
+    acceptance: {command: "docket import fixtures/sfd-variant-run.contract.yaml",
+                 expect: "exit 0, ≥5 admitted, refusals each cite A1–A9"}
+    anchors: [{compat: sfd-variant-handoff-bundle}]
 ```
 
 (The recursive fixture is the same trick the akinate skill used: the tool's
@@ -106,9 +106,15 @@ fixture outcome; shipping without the fixture passing is not.)
 
 One real piece of work through the full pipeline:
 **SFD handoff bundle → docket import → agent loops fulfill clauses →
-evidence bundles → verdicts → done.** The flock `feat/skills` contracts are
-the designated first case (they already exist, they are real, and they were
-the artifact that started this design).
+evidence bundles → verdicts → done.** The first case must be *small* — a
+tool buildable in hours, not days, so the falsifier measures the docket
+loop, not the workload. Source of cases: run the docket-emitting SFD
+variant (in `.agents/skills/`) on any small real need; every run emits a
+contract file, so fixtures accumulate as a byproduct of normal use.
+(The flock `feat/skills` contracts remain the *reference artifact* that
+started this design — illustrative material in `01`/`02` — but are
+explicitly NOT a demo or falsifier case: turning those clauses green means
+implementing Flock features. Decided by Pyro, 2026-06-12.)
 
 Docket is *refuted* — not merely imperfect — if any of these hold after a
 honest run:
@@ -157,4 +163,4 @@ principles informed the design — not dependencies, not integration targets.
    record) and a `projects/docket.md` dossier (routing card) — the proper
    downward/upward layer crossings.
 3. On approval: writing-plans for v0 against `03` (this doc), build through
-   the recursive fixture, then run the falsifier on flock `feat/skills`.
+   the recursive fixture, then run the falsifier on a small variant-generated case (flock demos ruled out — days of work; Pyro 2026-06-12).

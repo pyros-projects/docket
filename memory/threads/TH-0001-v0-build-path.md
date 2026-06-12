@@ -23,7 +23,7 @@ Sequence after sign-off:
 2. Implementation plan against docs/concepts/03 (writing-plans).
 3. Build v0 to the recursive fixture (docket-v0 contract imports through
    its own door, goes green under its own check).
-4. Falsifier run: import flock feat/skills .sfd contracts, run one real
+4. Falsifier run: import a small variant-generated contract file, run one real
    fulfillment loop, watch the four refutation conditions (second spec
    reality, ledger drift, evidence decay, verdict fatigue).
 

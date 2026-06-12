@@ -1,0 +1,195 @@
+contract: tipsy
+rev: 1
+source: .sfd/clause-log.md (SFD Gate 2, 2026-06-12)
+signed:
+  - rev: 1
+    by: pyro
+    date: 2026-06-12
+
+clauses:
+  - id: C-001
+    obligation: >
+      Given exactly one valid bill amount argument, tipsy MUST print to
+      stdout a bill line showing the parsed amount as $N.NN, followed by
+      exactly three tip-option lines for 10%, 15%, and 20% in ascending
+      order, each showing the rounded tip and the resulting total as $N.NN.
+    acceptance:
+      test: tests/test_output.py::test_success_format
+    anchors:
+      - surface: "calculate × success"
+      - decision: D-002
+    notes: "PENDING-HARNESS (A3): test target does not exist yet (pre-implementation handoff)."
+
+  - id: C-002
+    obligation: >
+      Tips MUST be rounded to the nearest $0.10, ties rounding up.
+    acceptance:
+      test: tests/test_rounding.py::test_nearest_dime_ties_up
+    anchors:
+      - surface: "calculate × success"
+      - decision: D-003
+    notes: "PENDING-HARNESS (A3): test target does not exist yet."
+
+  - id: C-003
+    obligation: >
+      Each displayed total MUST equal the parsed bill amount plus that
+      line's rounded tip, exact to the cent.
+    acceptance:
+      test: tests/test_output.py::test_total_equals_bill_plus_rounded_tip
+    anchors:
+      - surface: "calculate × success"
+      - decision: D-003
+    notes: "PENDING-HARNESS (A3): test target does not exist yet."
+
+  - id: C-004
+    obligation: >
+      Invocation-to-output MUST complete in under 50ms at p95 on the
+      reference machine.
+    acceptance:
+      metric: scripts/bench_startup.sh
+      threshold: "p95 < 50ms"
+    anchors:
+      - surface: "calculate × success"
+      - decision: D-004
+    notes: "PENDING-HARNESS (A3): bench script does not exist yet. Quantification of 'it should feel fast' (iteration round 1)."
+
+  - id: C-005
+    obligation: >
+      tipsy MUST reject zero and negative bill amounts with a single-line
+      error on stderr and exit status 2, writing nothing to stdout.
+    acceptance:
+      command: "tipsy -5 >/dev/null 2>&1; test $? -eq 2 && tipsy 0 >/dev/null 2>&1; test $? -eq 2"
+      expect: "exit 2 for both; one-line error on stderr; stdout empty"
+    anchors:
+      - surface: "calculate × validation-failure"
+      - decision: D-005
+    notes: "PENDING-HARNESS (A3): tipsy binary does not exist yet. An argument matching a negative number (e.g. -5) is parsed as an amount, not as an option."
+
+  - id: C-006
+    obligation: >
+      tipsy MUST NOT read stdin under any invocation — no interactive mode
+      exists.
+    acceptance:
+      command: "echo '42.50' | tipsy 2>&1; test $? -eq 2"
+      expect: "exit 2, usage on stderr, stdin never consumed, no prompt ever shown"
+    anchors:
+      - decision: D-006
+      - surface: "calculate × empty"
+    notes: "PENDING-HARNESS (A3). Mined from a paid rejection: round-1 prototype had a no-args prompt mode; user killed it ('flags only, I hate interactive prompts')."
+
+  - id: C-007
+    obligation: >
+      Invocation with no arguments MUST print usage to stderr and exit
+      status 2.
+    acceptance:
+      command: "tipsy >/dev/null 2>&1; test $? -eq 2"
+      expect: "exit 2; usage block on stderr; nothing on stdout"
+    anchors:
+      - surface: "calculate × empty"
+      - decision: D-006
+    notes: "PENDING-HARNESS (A3)."
+
+  - id: C-008
+    obligation: >
+      tipsy MUST reject non-numeric input with a single-line error on
+      stderr naming the rejected input, and exit status 2.
+    acceptance:
+      command: "tipsy abc >/dev/null 2>&1; test $? -eq 2"
+      expect: "exit 2; single-line stderr error containing the string 'abc'; stdout empty"
+    anchors:
+      - surface: "calculate × validation-failure"
+      - decision: D-007
+    notes: "PENDING-HARNESS (A3). Thousands separators ('1,234.56') are non-numeric under this clause — see decision log OQ-1."
+
+  - id: C-009
+    obligation: >
+      A single leading "$" on the amount argument MUST be accepted, with
+      output identical to the same invocation without it.
+    acceptance:
+      command: "diff <(tipsy '$20') <(tipsy 20)"
+      expect: "both exit 0; byte-identical stdout"
+    anchors:
+      - surface: "calculate × success"
+      - decision: D-007
+    notes: "PENDING-HARNESS (A3)."
+
+  - id: C-010
+    obligation: >
+      Amounts with more than two decimal places MUST be rejected with a
+      single-line error on stderr and exit status 2.
+    acceptance:
+      command: "tipsy 12.345 >/dev/null 2>&1; test $? -eq 2"
+      expect: "exit 2; one-line error on stderr; stdout empty"
+    anchors:
+      - surface: "calculate × validation-failure"
+      - decision: D-007
+    notes: "PENDING-HARNESS (A3)."
+
+  - id: C-011
+    obligation: >
+      Amounts greater than 999999.99 MUST be rejected with a single-line
+      error on stderr and exit status 2.
+    acceptance:
+      command: "tipsy 1000000 >/dev/null 2>&1; test $? -eq 2 && tipsy 999999.99 >/dev/null 2>&1; test $? -eq 0"
+      expect: "1000000 rejected with exit 2; boundary value 999999.99 accepted with exit 0"
+    anchors:
+      - surface: "calculate × validation-failure"
+      - decision: D-007
+    notes: "PENDING-HARNESS (A3)."
+
+  - id: C-012
+    obligation: >
+      Invocations with more than one positional argument MUST be rejected
+      with usage on stderr and exit status 2.
+    acceptance:
+      command: "tipsy 12 34 >/dev/null 2>&1; test $? -eq 2"
+      expect: "exit 2; error plus usage on stderr; stdout empty"
+    anchors:
+      - surface: "calculate × validation-failure"
+      - decision: D-007
+    notes: "PENDING-HARNESS (A3)."
+
+  - id: C-013
+    obligation: >
+      Running tipsy with the option --help MUST print usage text to stdout
+      and exit status 0.
+    acceptance:
+      command: "tipsy --help >/dev/null 2>&1; test $? -eq 0"
+      expect: "exit 0; usage text on stdout (command, amount rules, exit codes); nothing on stderr"
+    anchors:
+      - surface: "help × success"
+      - decision: D-002
+    notes: "PENDING-HARNESS (A3)."
+
+  - id: C-014
+    obligation: >
+      Error messages MUST NOT contain stack traces, jargon, or multi-line
+      dumps — one human-readable line per failure (usage block excepted).
+    acceptance:
+      verdict: human
+    anchors:
+      - surface: "calculate × validation-failure"
+      - decision: D-007
+
+  - id: C-015
+    obligation: >
+      tipsy MUST reject any option other than --help with a single-line
+      error on stderr naming the unknown option, and exit status 2.
+    acceptance:
+      command: "tipsy --json >/dev/null 2>&1; test $? -eq 2"
+      expect: "exit 2; stderr error naming '--json'; --help is the only recognized option"
+    anchors:
+      - surface: "calculate × validation-failure"
+      - decision: D-002
+    notes: "PENDING-HARNESS (A3)."
+
+  - id: C-016
+    obligation: >
+      A successful calculation MUST exit with status 0.
+    acceptance:
+      command: "tipsy 42.50 >/dev/null 2>&1; test $? -eq 0"
+      expect: "exit 0"
+    anchors:
+      - surface: "calculate × success"
+      - decision: D-008
+    notes: "PENDING-HARNESS (A3). Born at contract compile: transcript showed `echo $?` → 0 but no iteration clause pinned it."
