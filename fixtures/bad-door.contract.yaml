@@ -56,7 +56,7 @@ clauses:
     anchors:
       - decision: D-005
 
-  - id: B-007                      # A9 flag: high risk, thin evidence
+  - id: B-007                      # A9 flag: high risk, thin evidence (also gets A3 PENDING-HARNESS: test_b.py missing)
     obligation: >
       Replays MUST be idempotent.
     acceptance:

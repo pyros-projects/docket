@@ -79,6 +79,7 @@ def _check_a6(c: dict) -> Finding | None:
     if re.search(r"\d", ob):
         return None
     acc = c.get("acceptance")
+    # raw dict check is equivalent to parsed.acceptance.kind: A6 only runs after pydantic validation succeeds
     if isinstance(acc, dict) and "metric" in acc:
         return None  # the number lives in the threshold
     return Finding("A6", c.get("id"), "refuse", MESSAGES["A6"])

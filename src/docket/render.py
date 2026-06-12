@@ -24,6 +24,8 @@ def import_report(name: str, rev: int, source: str, signed: list,
     else:
         lines.append("signed: NONE — law without signature (sign with: docket sign)")
     lines.append(f"admitted: {len(rep.admitted)}")
+    for o in rep.overrides:
+        lines.append(f"  ✍ {o['id']} [A2] admitted unanchored — signed by {o['signed_by']}")
     lines.append(f"refused: {len(rep.refusals)}")
     for f in rep.refusals:
         lines.append(f"  ✘ {f.clause_id} [{f.check}] {f.message}")
@@ -32,7 +34,5 @@ def import_report(name: str, rev: int, source: str, signed: list,
         for f in rep.flags:
             glyph = "◌" if f.flag == "PENDING-HARNESS" else "⚑"
             lines.append(f"  {glyph} {f.clause_id} [{f.check}] {f.flag} — {f.message}")
-    for o in rep.overrides:
-        lines.append(f"  ✍ {o['id']} [A2] admitted unanchored — signed by {o['signed_by']}")
     lines.append(f"→ {dest}")
     return "\n".join(lines)

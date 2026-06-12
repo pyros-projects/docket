@@ -34,6 +34,7 @@ def test_refusals_cite_door_checks(tmp_path, capsys):
     assert re.search(r"⚑ B-007 \[A9\] THIN-EVIDENCE", out)
     assert re.search(r"◌ B-008 \[A3\] PENDING-HARNESS", out)
     assert re.search(r"⚑ B-009 \[A5\] OVERLAP", out)
+    assert re.search(r"⚑ B-010 \[A5\] OVERLAP", out)
     assert "admitted: 5" in out
 
 
