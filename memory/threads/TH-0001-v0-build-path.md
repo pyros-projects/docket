@@ -33,6 +33,24 @@ variant. Source material copied into `.agents/skills/surface-first-development/`
 copied to `docs/upstream/`. Variant is developed here against the door,
 eventual home is limitless (producer side).
 
+Parallel work item (added 2026-06-12, late evening — Pyro): integrate
+grill-me / grill-with-docs (mattpocock/skills@grill-me, 305K installs;
+grill-with-docs adds inline ADR/CONTEXT.md output) into the SFD variant as
+the question-driven producer path for surfaceless work — SFD's own "When
+NOT to Use" list (no meaningful interaction surface, complexity below the
+surface). Shape: either a fallback mode inside the variant or a sibling
+"grill" variant. Core move: every resolved branch of the grilling decision
+tree lands as a clause-log entry at birth (grill-with-docs' ADRs ≈ the
+decision log / the why), then compiles through Phase 5 + self-admission +
+round-trip exactly like surface-derived clauses. Second horse, same door.
+Caveat from the analysis: questions catch what surfaces hide (invariants,
+failure policy); surfaces catch what questions can't name (gestalts) —
+fallback, not replacement. Feeds upstream SFD 0.7 in limitless eventually.
+
+Falsifier note (same evening): tipsy's signed bundle (16 admissible
+clauses, docs/dojo/runs/pressure-tipsy/) is the leading candidate for
+docket v0's first real fulfillment run — Phase 6 as fixture resurrection.
+
 Watch items: docker-typo annoyance in practice; whether A4's MUST-pedantry
 or A6's number-demands annoy real authoring (Pyro flagged the question);
 whether verdict:human becomes a lazy-clause backdoor (count them).
