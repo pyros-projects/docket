@@ -79,4 +79,14 @@ review captured for /distill.
 
 Watch items: docker-typo annoyance in practice; whether A4's MUST-pedantry
 or A6's number-demands annoy real authoring (Pyro flagged the question);
-whether verdict:human becomes a lazy-clause backdoor (count them).
+whether verdict:human becomes a lazy-clause backdoor (count them);
+guardian Goodharting (Pyro, 2026-06-13): the hollow-oracle attack — agent
+authors both work and harness, test always passes, ledger green over broken
+reality. Mechanically undetectable by design (boundary discipline). v0
+defenses: first-verdict-reads-the-harness discipline, A9 multi-kind
+evidence, falsifiers #2/#3 watching for ledger drift / evidence decay.
+The structural seam: law is signed, the oracle it points to arrives later
+(PENDING-HARNESS) and is never re-signed. If the falsifier run shows decay,
+the pre-registered lesson applies (door extends to evidence admission) and
+the Proofroom verifier-independence thread (KG thread 9) graduates from
+research to requirement.
