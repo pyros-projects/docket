@@ -15,6 +15,30 @@ TWO_EXITS = ("  → fix the code or amend the contract. The docket does not care
              "    which, but it will not go green by argument.")
 
 
+def short_name(clause) -> str:
+    words = clause.obligation.strip().split()
+    return " ".join(words[:5])[:40]
+
+
+def check_line(clause, res) -> str:
+    pad = max(2, 55 - len(f"{clause.id} {short_name(clause)}"))
+    head = f"{clause.id} {short_name(clause)} " + "." * pad
+    if res.result == "green":
+        return f"{head} green"
+    if res.result == "pending-harness":
+        return f"{head} PENDING-HARNESS\n  {res.detail}"
+    if res.result == "human":
+        return f"{head} verdict: human — cannot go green mechanically; route to docket review"
+    body = [f"{head} FAIL",
+            f"  obligation:  {clause.obligation.strip()[:100]}",
+            f"  evidence:    {res.detail}"]
+    if res.drift:
+        body.append(f"  drift:       {res.drift}")
+    body.append("")
+    body.append(TWO_EXITS)
+    return "\n".join(body)
+
+
 def import_report(name: str, rev: int, source: str, signed: list,
                   rep: DoorReport, dest: str) -> str:
     lines = [f"DOCKET IMPORT — {name} rev {rev}", f"source: {source}"]

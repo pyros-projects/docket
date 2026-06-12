@@ -52,6 +52,8 @@ def _derive_one(clause: Clause, contract: Contract, led: Ledger, root: Path) -> 
 
     latest_bundle = bundles[-1] if bundles else None
     latest_check = checks[-1] if checks else None
+    # CONVENTION (pinned): verdict.bundle stores the bundle FILENAME STEM
+    # ("bundle-001", no .json) — Plan 2's verdict writer must honor this.
     judged = {v.get("bundle") for v in verdicts}
     accepted = [v for v in verdicts if v.get("verdict") == "accepted"]
     # an accepted verdict whose bundle got invalidated by a later amendment:

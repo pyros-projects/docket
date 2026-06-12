@@ -18,6 +18,11 @@ def build_parser() -> argparse.ArgumentParser:
     imp.add_argument("file", type=Path)
     imp.add_argument("--sign-unanchored", metavar="AUTHORITY", default=None)
 
+    chk = sub.add_parser("check", help="run acceptance, name drift, record result")
+    chk.add_argument("clause", nargs="?", default=None)
+    chk.add_argument("--all", action="store_true")
+    chk.add_argument("--quiet", action="store_true")
+
     return p
 
 
@@ -26,7 +31,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.cmd is None:
         print("docket: no command given (try: docket status)", file=sys.stderr)
         return 2
-    return {"import": cmd_import}[args.cmd](args)
+    return {"import": cmd_import, "check": cmd_check}[args.cmd](args)
 
 
 def cmd_import(args) -> int:
@@ -78,6 +83,47 @@ def cmd_import(args) -> int:
     print(import_report(name, contract.rev, contract.source, contract.signed,
                         rep, str(dest.relative_to(args.root))))
     return 0
+
+
+def cmd_check(args) -> int:
+    from docket.render import check_line
+    from docket.runner import run_acceptance
+    from docket.storage import Ledger
+
+    led = Ledger(args.root)
+    if not args.all and args.clause is None:
+        print("docket check: name a clause or pass --all", file=sys.stderr)
+        return 2
+
+    failures = 0
+    for contract in led.contracts():
+        for clause in contract.clauses:
+            if clause.status != "active":
+                continue
+            if not args.all and clause.id != args.clause:
+                continue
+            res = run_acceptance(clause.acceptance, args.root, led.runner_template)
+            if res.result in ("green", "red"):
+                led.append_record(clause.id, "check", {
+                    "clause": clause.id, "rev": contract.rev,
+                    "result": res.result, "detail": res.detail, "drift": res.drift,
+                })
+            if res.result == "red":
+                failures += 1
+            if not args.quiet:
+                print(check_line(clause, res))
+
+    # stale clauses fail CI too (concepts/02 §4: any broken/stale clause fails the build)
+    from docket.state import derive_views
+    for contract in led.contracts():
+        for v in derive_views(contract, led, args.root):
+            if v.state == "stale" and (args.all or v.clause.id == args.clause):
+                failures += 1
+                if not args.quiet:
+                    print(f"{v.clause.id} stale — evidence invalidated at rev "
+                          f"{contract.rev}; re-verdict needed")
+
+    return 1 if failures else 0
 
 
 def entry() -> None:
