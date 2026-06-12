@@ -1,0 +1,38 @@
+---
+title: docket-project-context
+type: project-context
+created: '2026-06-12'
+updated: '2026-06-12'
+---
+
+# Docket — project context
+
+**What:** the repo's courtroom — file-native ledger of obligations
+(contracts), evidence bundles, verdicts, signatures. Core claim: contracts
+are amortized authority (few human decisions, mechanically enforced many
+times). Named failure mode to never recreate: "no second spec reality."
+
+**State (2026-06-12):** concept phase complete. Four concept docs in
+`docs/concepts/` converged through a full-day three-way conversation
+(Pyro + Claude Fable 5 + Codie GPT-5.4) plus two SFD passes (courtroom
+surface; schema + door policy). No code. Pyro has NOT yet signed off on the
+v0 scope cut in `03` — that is the open gate.
+
+**Where this came from:** reading flock `feat/skills` `.sfd/` artifacts →
+"SFD produces contracts, not specs" (Pyro) → decide-vs-score correction →
+amortized-authority frame → Codie's "contract ledger → tasks → evidence
+bundles, no second spec reality" → boundary-artifact discipline (docket
+integrates with nothing) → two SFD passes converged surfaces and door.
+Full provenance pointers in `docs/concepts/00`, bottom section.
+
+**Next steps:**
+1. Pyro reviews the four concept docs (open gate).
+2. KG hygiene in claude-knowledge: `sketches/docket.md` + `projects/docket.md`
+   dossier (the legitimate layer crossings).
+3. On approval: implementation plan against `docs/concepts/03`, build to the
+   recursive fixture, then falsifier run on flock `feat/skills` contracts.
+
+**Related vault material (claude-knowledge):** capture
+`2026-06-12-sfd-produces-contracts-not-specs-three-way-convergence` (queued,
+claims 143+); obs-007 (merge reflex / layer physics); agent-work-acceptance
+thread 9 (Proofroom vocabulary — conceptual sibling, not a dependency).
