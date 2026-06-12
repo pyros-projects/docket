@@ -48,7 +48,7 @@ def main(argv: list[str] | None = None) -> int:
 
 
 def cmd_import(args) -> int:
-    from docket.accord import run_door
+    from docket.accord import Finding, run_door
     from docket.model import Contract, dump_contract, load_contract_data
     from docket.render import import_report
     from docket.storage import Ledger
@@ -70,7 +70,19 @@ def cmd_import(args) -> int:
               file=sys.stderr)
         return 2
 
+    # clause ids are per-project monotonic (concepts/01) — the flat
+    # evidence/<clause>/ namespace depends on it, so A7 extends across contracts
+    existing_ids = {cl.id: c.contract for c in led.contracts() for cl in c.clauses}
+
     rep = run_door(data, args.root, sign_unanchored=args.sign_unanchored)
+
+    collisions = [c for c in rep.admitted if c.id in existing_ids]
+    for c in collisions:
+        rep.refusals.append(Finding("A7", c.id, "refuse",
+            f"clause id already law in contract {existing_ids[c.id]!r} — ids are per-project monotonic"))
+    rep.admitted = [c for c in rep.admitted if c.id not in existing_ids]
+    rep.flags = [f for f in rep.flags if f.clause_id not in {c.id for c in collisions}]
+
     if not rep.admitted:
         print("docket import: no clauses admitted"
               + (" (file has no clauses)" if not data.get("clauses") else ""),
@@ -224,6 +236,9 @@ def cmd_file(args) -> int:
         for clause in contract.clauses:
             if clause.id == args.clause:
                 target = (contract, clause)
+                break
+        if target:
+            break
     if target is None:
         print(f"docket file: unknown clause {args.clause}", file=sys.stderr)
         return 2

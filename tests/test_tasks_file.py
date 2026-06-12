@@ -26,6 +26,16 @@ def test_tasks_clear_when_all_green(ledger_root, capsys):
     assert "docket clear" in out
 
 
+def test_tasks_excludes_review_and_stuck(ledger_root, capsys):
+    (ledger_root / "tests").mkdir(); (ledger_root / "tests/test_demo.py").write_text("x=1\n")
+    write_history(ledger_root, "C-001", "bundle-001.json",
+                  {"clause": "C-001", "claim": "stuck", "stuck_on": "flaky",
+                   "filed_by": "l", "rev_at_filing": 1, "evidence": []})
+    code, out, err = run_cli(["tasks", "--next"], ledger_root, capsys)
+    assert code == 0
+    assert "docket clear" in out          # stuck waits for a verdict, not a worker
+
+
 def test_file_appends_bundle(ledger_root, capsys, tmp_path):
     b = tmp_path / "bundle.json"
     b.write_text(json.dumps({"clause": "C-001", "claim": "satisfied",

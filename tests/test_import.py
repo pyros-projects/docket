@@ -65,3 +65,22 @@ def test_import_duplicate_contract_refused(ledger_root, capsys):
     code, out, err = run_cli(["import", str(src)], ledger_root, capsys)
     assert code == 2
     assert "already exists" in err
+
+
+def test_import_cross_contract_id_collision_refused(ledger_root, capsys, tmp_path):
+    other = tmp_path / "other.contract.yaml"
+    other.write_text(
+        "contract: other\nrev: 1\nsource: t\nsigned: []\n"
+        "clauses:\n"
+        "  - id: C-001\n"
+        "    obligation: >\n      other MUST exit 1 on failure.\n"
+        "    acceptance:\n      test: tests/test_o.py::test_o\n"
+        "    anchors:\n      - decision: D-001\n"
+        "  - id: C-900\n"
+        "    obligation: >\n      other MUST write logs.\n"
+        "    acceptance:\n      test: tests/test_o.py::test_o2\n"
+        "    anchors:\n      - decision: D-002\n")
+    code, out, err = run_cli(["import", str(other)], ledger_root, capsys)
+    assert code == 0                      # C-900 still admitted
+    assert "admitted: 1" in out
+    assert re.search(r"✘ C-001 \[A7\].*already law.*demo", out)
