@@ -9,8 +9,18 @@ created: '2026-06-12'
 updated: '2026-06-12'
 ---
 
-Open gate: Pyro has not yet reviewed/signed the four concept docs (notably
-the v0 scope cut in docs/concepts/03).
+~~Open gate: Pyro has not yet reviewed/signed the four concept docs (notably
+the v0 scope cut in docs/concepts/03).~~ **GATE CLOSED 2026-06-12 late
+night — Pyro approved the concepts** and authorized plan-writing. Two
+implementation plans written the same night (`docs/plans/2026-06-12-docket-
+v0-plan-{1,2}-*.md`, per concepts/03's read-mostly-first sequencing option),
+self-reviewed (5 fixes, incl. the D0-001 RFC-keyword self-reference the
+recursive fixture caught at plan time), then Codie-reviewed via codex:rescue
+(1 blocker: add --sign-unanchored dropped; 5 should-fix: overlap as state,
+A3 command-token depth, bash-not-sh for process substitution, checklist on
+inline signing, holding-suppression bug — ALL incorporated as design
+decisions 1–26). Codie also simulated the door regexes against all 40
+graduation-fixture clauses: zero false refusals. Next: execute plan 1.
 
 2026-06-12 (later): Accord fork reconciled per Codie's verdict — see
 DC-0002. Door is now A1–A9 ("the Accord"), rejections are three-typed,
