@@ -5,6 +5,9 @@ metric. Threshold grammar (design decision 2):
   "<label words> <op> <number><unit> [trailing prose]"
 matched against `name: value` lines on the metric script's stdout by
 label-token overlap.
+
+Commands are law: authored and signed by the authority. The runner is not a
+sandbox — the signature is the trust boundary.
 """
 from __future__ import annotations
 
@@ -58,18 +61,35 @@ def command_harness_missing(command: str, root: Path) -> str | None:
         for tok in segment.strip().split():
             tok = tok.strip("'\"")
             if tok in WRAPPERS or re.fullmatch(r"[A-Z_]+=\S*", tok) \
-                    or re.fullmatch(r"-{1,2}[\w-]+|\d+(?:\.\d+)?[smh]?", tok):
-                continue  # wrapper, env assignment, option, or duration arg
+                    or re.fullmatch(r"-{1,2}[\w-]+|\d+(?:\.\d+)?[smh]?", tok) \
+                    or tok.startswith(("<", ">")) or re.fullmatch(r"\d+[<>]&?\d*", tok):
+                continue  # wrapper, env assignment, option, duration, or redirect
             if not (shutil.which(tok) or (root / tok).exists()):
                 return tok
             break  # segment's command resolves; rest are its arguments
     return None
 
 
+TIMEOUT_S = 600
+
+
+def _txt(s) -> str:
+    """TimeoutExpired.stdout/stderr can be None or bytes even in text mode."""
+    if s is None:
+        return ""
+    return s.decode(errors="replace") if isinstance(s, bytes) else s
+
+
 def _run(cmd: str, root: Path) -> subprocess.CompletedProcess:
     # bash, not sh: graduation fixtures use process substitution (decision 1)
-    return subprocess.run(cmd, shell=True, executable="/bin/bash", cwd=root,
-                          capture_output=True, text=True, timeout=600)
+    try:
+        return subprocess.run(cmd, shell=True, executable="/bin/bash", cwd=root,
+                              capture_output=True, text=True, timeout=TIMEOUT_S)
+    except subprocess.TimeoutExpired as e:
+        return subprocess.CompletedProcess(
+            args=cmd, returncode=124,
+            stdout=_txt(e.stdout),
+            stderr=_txt(e.stderr) + f"\ndocket: acceptance timed out after {TIMEOUT_S}s")
 
 
 def _tail(proc: subprocess.CompletedProcess, n: int = 12) -> str:
@@ -116,6 +136,9 @@ def run_acceptance(acc: Acceptance, root: Path,
             continue
         have = set(re.findall(r"[a-z0-9]+", m.group("name").lower()))
         if want & have:
+            line_unit = m.group("unit").lower()
+            if unit and line_unit and line_unit != unit:
+                continue  # decision 2: unit mismatch = not the contracted metric
             value = float(m.group("num"))
             ok = _compare(value, op, bound)
             detail = f"{m.group('name').strip()} = {value} (threshold {op} {bound}{unit})"

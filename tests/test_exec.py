@@ -72,6 +72,7 @@ def test_a3_command_sees_through_wrappers_and_pipes(ledger_root):
     assert command_harness_missing(
         "diff <(tipsy 10) <(tipsy 10)", ledger_root) == "tipsy"
     assert command_harness_missing("true && echo ok", ledger_root) is None
+    assert command_harness_missing("cat /etc/hostname; >out.txt true", ledger_root) is None
 
 
 def test_commands_run_under_bash(ledger_root):
@@ -80,3 +81,21 @@ def test_commands_run_under_bash(ledger_root):
                           expect="process substitution works"),
         ledger_root, Ledger(ledger_root).runner_template)
     assert res.result == "green"
+
+
+def test_timeout_is_red_not_crash(ledger_root, monkeypatch):
+    import docket.runner as runner_mod
+    monkeypatch.setattr(runner_mod, "TIMEOUT_S", 1)
+    res = run_acceptance(AcceptanceCommand(command="sleep 5", expect="exit 0"),
+                         ledger_root, Ledger(ledger_root).runner_template)
+    assert res.result == "red"
+    assert "timed out" in res.output_tail
+
+
+def test_unit_mismatch_not_green(ledger_root):
+    name = _script(ledger_root, "bench_gb.sh", 'echo "peak rss: 2 GB"')
+    res = run_acceptance(
+        AcceptanceMetric(metric=f"./{name}", threshold="peak RSS < 64 MB"),
+        ledger_root, Ledger(ledger_root).runner_template)
+    assert res.result == "red"
+    assert "not found" in res.drift
