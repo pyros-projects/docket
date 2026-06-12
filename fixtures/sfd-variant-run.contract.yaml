@@ -1,0 +1,298 @@
+contract: mdtodo
+rev: 1
+source: .sfd/clause-log.md (SFD Gate 2, 2026-06-12)
+signed:
+  - {rev: 1, by: Pyro, date: 2026-06-12}
+
+clauses:
+  - id: C-001
+    obligation: >
+      mdtodo MUST resolve its inputs as: each positional path that is a file is
+      scanned as given; each path that is a directory is scanned recursively for
+      *.md and *.markdown files.
+    acceptance:
+      test: tests/test_scan_set.py::test_input_resolution
+    anchors:
+      - surface: "scan-text × success"
+      - decision: D-003
+
+  - id: C-002
+    obligation: >
+      mdtodo MUST NOT run as a daemon or watch the filesystem — every invocation
+      is a one-shot scan that terminates on its own.
+    acceptance:
+      command: "timeout 30 mdtodo demo/docs >/dev/null 2>&1; test $? -ne 124"
+      expect: "process always exits on its own; never blocks waiting on filesystem events"
+    anchors:
+      - decision: D-002
+
+  - id: C-003
+    obligation: >
+      Default text output MUST be grouped by file: a header line with the file
+      path (as given on the command line; files discovered under a directory
+      rendered as the given directory path joined with the relative remainder),
+      one line per item of the form "<line>  <marker> <text>" (marker rendered
+      "[ ]", "TODO:", or "FIXME:"), blank lines between groups, and a final
+      summary line of the form "<T> TODOs in <M> files (<K> files scanned)",
+      counts pluralized naturally.
+    acceptance:
+      test: tests/test_text_output.py::test_golden_layout
+    anchors:
+      - surface: "scan-text × success"
+      - decision: D-003
+      - decision: D-013
+    notes: >
+      Tightened at round-trip round 1: footer template and directory-path
+      rendering were leaks. Partial-failure footer variant is C-024.
+
+  - id: C-004
+    obligation: >
+      Output ordering MUST be deterministic: files in lexicographic path order,
+      items within a file in ascending line order, identical in text and JSON
+      modes.
+    acceptance:
+      test: tests/test_text_output.py::test_ordering_stable
+    anchors:
+      - surface: "scan-text × success"
+      - decision: D-003
+
+  - id: C-005
+    obligation: >
+      Unchecked GFM task list items ("- [ ]", "* [ ]", "+ [ ]", any leading
+      indentation) MUST be reported as TODOs of kind "task", with text = the
+      item text after the checkbox.
+    acceptance:
+      test: tests/test_formats.py::test_unchecked_task_items
+    anchors:
+      - surface: "scan-text × success"
+      - decision: D-004
+
+  - id: C-006
+    obligation: >
+      Checked task list items ("[x]" or "[X]") MUST NOT be reported.
+    acceptance:
+      test: tests/test_formats.py::test_checked_items_excluded
+    anchors:
+      - surface: "scan-text × success"
+      - decision: D-004
+
+  - id: C-007
+    obligation: >
+      A line containing the marker "TODO:" (uppercase, colon required) MUST be
+      reported as kind "todo", with text = the remainder of the line after the
+      marker, trimmed, and a trailing HTML comment closer "-->" stripped; the
+      marker is recognized anywhere in a line, including inside HTML comments.
+    acceptance:
+      test: tests/test_formats.py::test_todo_marker
+    anchors:
+      - surface: "scan-text × success"
+      - decision: D-004
+      - decision: D-012
+
+  - id: C-008
+    obligation: >
+      A line containing the marker "FIXME:" (uppercase, colon required) MUST be
+      reported as kind "fixme", under the same matching rules as "TODO:".
+    acceptance:
+      test: tests/test_formats.py::test_fixme_marker
+    anchors:
+      - surface: "scan-text × success"
+      - decision: D-004
+      - decision: D-012
+
+  - id: C-009
+    obligation: >
+      Lines inside fenced code blocks MUST be scanned under the same rules as
+      any other line — there is no code-block exclusion.
+    acceptance:
+      test: tests/test_formats.py::test_fenced_code_blocks_scanned
+    anchors:
+      - surface: "scan-text × success"
+      - decision: D-004
+
+  - id: C-010
+    obligation: >
+      With --json, mdtodo MUST write a single JSON array to stdout containing
+      one object per TODO item with exactly the fields file (path as displayed
+      in text mode), line (1-based), text (content with the marker stripped),
+      kind (one of "task" | "todo" | "fixme"); zero items yields [].
+    acceptance:
+      test: tests/test_json_output.py::test_array_shape_and_fields
+    anchors:
+      - surface: "scan-json × success"
+      - surface: "scan-json × empty"
+      - decision: D-006
+
+  - id: C-011
+    obligation: >
+      Scanning a single 100 MB markdown file MUST keep peak resident memory
+      below 64 MB.
+    acceptance:
+      metric: scripts/bench_bigfile.sh
+      threshold: "peak RSS < 64 MB on the 100 MB reference input"
+    anchors:
+      - surface: "scan-text × success"
+      - decision: D-005
+      - decision: D-012
+    risk: medium
+    notes: >
+      bench_bigfile.sh emits two metrics (peak RSS, wall clock); C-011 binds
+      only the memory metric, C-012 binds only the time metric (A5 OVERLAP
+      resolved by scoping).
+
+  - id: C-012
+    obligation: >
+      Scanning a single 100 MB markdown file MUST complete in under 5 seconds
+      wall clock on the reference machine (NVMe-class developer laptop).
+    acceptance:
+      metric: scripts/bench_bigfile.sh
+      threshold: "wall clock < 5 s on the 100 MB reference input"
+    anchors:
+      - surface: "scan-text × success"
+      - decision: D-005
+      - decision: D-012
+    notes: >
+      Shares scripts/bench_bigfile.sh with C-011; binds the time metric only
+      (A5 OVERLAP resolved by scoping).
+
+  - id: C-013
+    obligation: >
+      mdtodo MUST NOT read any configuration file — no .mdtodorc, no XDG
+      config, no environment-pointed file; all behavior is controlled by
+      command-line flags only.
+    acceptance:
+      test: tests/test_no_config.py::test_rc_file_ignored
+    anchors:
+      - decision: D-008
+
+  - id: C-014
+    obligation: >
+      A file that cannot be read MUST NOT abort the run: mdtodo emits one
+      warning line to stderr, skips the file, continues scanning, and still
+      reports results from readable files.
+    acceptance:
+      test: tests/test_partial_failure.py::test_unreadable_file_skipped
+    anchors:
+      - surface: "scan-text × permission-denied"
+      - surface: "scan-text × partial-failure"
+      - surface: "scan-text × system-failure"
+      - surface: "scan-json × permission-denied"
+      - decision: D-009
+    risk: medium
+
+  - id: C-016
+    obligation: >
+      When a text-mode scan completes with zero TODOs, mdtodo MUST print
+      exactly one line — "No TODOs found (<N> files scanned)." with the count
+      pluralized naturally — and nothing else to stdout.
+    acceptance:
+      test: tests/test_text_output.py::test_empty_result_message
+    anchors:
+      - surface: "scan-text × empty"
+      - decision: D-010
+    notes: >
+      Pluralization wording aligned with C-003 at round-trip round 2.
+      Interaction with C-024 (zero TODOs AND unreadable files in one run) was
+      never demonstrated to the user and is an open question in the decision
+      log — this clause is only evidenced for fully-readable runs.
+
+  - id: C-017
+    obligation: >
+      In --json mode, stdout MUST contain only the JSON document; all warnings
+      and diagnostics go to stderr.
+    acceptance:
+      test: tests/test_json_output.py::test_stdout_contains_only_json
+    anchors:
+      - surface: "scan-json × success"
+      - surface: "scan-json × partial-failure"
+      - surface: "scan-json × system-failure"
+      - surface: "scan-json × empty"
+      - decision: D-009
+
+  - id: C-018
+    obligation: >
+      An invalid invocation (no paths, unknown flag, or a named path that does
+      not exist) MUST be rejected before any scanning begins, with an error
+      line on stderr naming the problem.
+    acceptance:
+      test: tests/test_cli.py::test_invalid_invocations_rejected
+    anchors:
+      - surface: "usage × validation-failure"
+      - decision: D-010
+
+  - id: C-019
+    obligation: >
+      mdtodo --help MUST print usage text to stdout and exit 0.
+    acceptance:
+      command: "mdtodo --help > h.txt; test $? -eq 0 && grep -q '^usage: mdtodo' h.txt"
+      expect: "usage text on stdout, exit status 0"
+    anchors:
+      - surface: "usage × success"
+      - decision: D-010
+
+  - id: C-020
+    obligation: >
+      All warning and error lines MUST be single-line, plain-language messages
+      with no stack traces and no internal jargon.
+    acceptance:
+      verdict: human
+    anchors:
+      - surface: "scan-text × permission-denied"
+      - surface: "usage × validation-failure"
+      - decision: D-009
+
+  - id: C-021
+    obligation: >
+      A run in which every input file was readable and scanning completed MUST
+      exit 0, regardless of whether any TODOs were found.
+    acceptance:
+      test: tests/test_cli.py::test_exit_zero_on_clean_scan
+    anchors:
+      - surface: "scan-text × success"
+      - surface: "scan-text × empty"
+      - surface: "scan-json × success"
+      - surface: "scan-json × empty"
+      - decision: D-010
+      - decision: D-012
+
+  - id: C-022
+    obligation: >
+      A run in which one or more files were unreadable but scanning otherwise
+      completed MUST exit 1.
+    acceptance:
+      test: tests/test_cli.py::test_exit_one_on_partial_failure
+    anchors:
+      - surface: "scan-text × partial-failure"
+      - surface: "scan-json × partial-failure"
+      - decision: D-010
+
+  - id: C-023
+    obligation: >
+      An invalid invocation MUST exit 2.
+    acceptance:
+      test: tests/test_cli.py::test_exit_two_on_usage_error
+    anchors:
+      - surface: "usage × validation-failure"
+      - decision: D-010
+
+  - id: C-024
+    obligation: >
+      When one or more files were unreadable, the text-mode summary line's
+      parenthetical MUST read "(<R> of <K> files scanned, <U> unreadable)",
+      where K counts every file selected for scanning and R = K - U.
+    acceptance:
+      test: tests/test_partial_failure.py::test_partial_summary_accounting
+    anchors:
+      - surface: "scan-text × partial-failure"
+      - surface: "scan-text × permission-denied"
+      - decision: D-013
+
+  - id: C-025
+    obligation: >
+      Every invalid-invocation error line MUST be followed by a one-line usage
+      synopsis ("usage: mdtodo [--json] <path>...") on stderr.
+    acceptance:
+      test: tests/test_cli.py::test_usage_synopsis_on_error
+    anchors:
+      - surface: "usage × validation-failure"
+      - decision: D-013

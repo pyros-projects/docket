@@ -2,7 +2,10 @@ from docket.cli import main
 
 
 def test_version(capsys):
-    assert main(["--version"]) == 0
+    import pytest
+    with pytest.raises(SystemExit) as e:
+        main(["--version"])
+    assert e.value.code == 0
     assert capsys.readouterr().out.startswith("docket ")
 
 

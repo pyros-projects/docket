@@ -1,0 +1,100 @@
+contract: bad-door
+rev: 1
+source: hand-authored door-exercise fixture (one clause per Accord outcome)
+signed: []
+
+clauses:
+  - id: B-001                      # A1 refuse: no acceptance
+    obligation: >
+      The tool MUST exit 0 on success.
+    anchors:
+      - decision: D-001
+
+  - id: B-002                      # A2 refuse: no anchors
+    obligation: >
+      The tool MUST exit 0 on success.
+    acceptance:
+      test: tests/test_b.py::test_b002
+
+  - id: B-003                      # A4 refuse: SHOULD
+    obligation: >
+      The tool SHOULD respond to users politely.
+    acceptance:
+      test: tests/test_b.py::test_b003
+    anchors:
+      - decision: D-002
+
+  - id: B-004                      # A6 refuse: qualitative, unnumbered
+    obligation: >
+      Startup MUST be fast.
+    acceptance:
+      test: tests/test_b.py::test_b004
+    anchors:
+      - decision: D-003
+
+  - id: B-005                      # A7 refuse: duplicate id (pair below)
+    obligation: >
+      The tool MUST write logs to stderr.
+    acceptance:
+      test: tests/test_b.py::test_b005
+    anchors:
+      - decision: D-004
+
+  - id: B-005
+    obligation: >
+      The tool MUST write logs to stdout.
+    acceptance:
+      test: tests/test_b.py::test_b005x
+    anchors:
+      - decision: D-004
+
+  - id: B-006                      # A8 refuse: two laws in one clause
+    obligation: >
+      The tool MUST validate input and MUST write a report file.
+    acceptance:
+      test: tests/test_b.py::test_b006
+    anchors:
+      - decision: D-005
+
+  - id: B-007                      # A9 flag: high risk, thin evidence
+    obligation: >
+      Replays MUST be idempotent.
+    acceptance:
+      test: tests/test_b.py::test_b007
+    anchors:
+      - incident: postmortem-001
+    risk: high
+    evidence_required: [test]
+
+  - id: B-008                      # A3 flag: harness missing
+    obligation: >
+      The tool MUST reject empty input files.
+    acceptance:
+      test: tests/test_missing.py::test_b008
+    anchors:
+      - decision: D-006
+
+  - id: B-009                      # A5 flag pair: same nodeid, both flagged
+    obligation: >
+      Output MUST be sorted ascending.
+    acceptance:
+      test: tests/test_b.py::test_shared
+    anchors:
+      - decision: D-007
+
+  - id: B-010
+    obligation: >
+      Output MUST NOT contain duplicates.
+    acceptance:
+      test: tests/test_b.py::test_shared
+    anchors:
+      - decision: D-007
+
+  - id: B-011                      # clean — admits with no findings
+    obligation: >
+      The tool MUST exit 2 on invalid invocation.
+    acceptance:
+      command: "true"
+      expect: "door-fixture filler; the command's exit 0 is the assertion"
+    anchors:
+      - decision: D-008
