@@ -76,7 +76,6 @@ def test_a7_schema_error_refused():
 
 def test_a7_unhashable_id_refused_not_crash():
     rep = door(contract(clause(id=["C-001"])))
-    assert ("C-001" not in {f.clause_id for f in rep.refusals} or True)  # no crash is the point
     assert any(f.check == "A7" for f in rep.refusals)
     assert rep.admitted == []
 
@@ -104,3 +103,40 @@ def test_refusals_a1_a4_a6_a7():
     ))
     assert {("C-001", "A1"), ("C-002", "A4"), ("C-003", "A6"),
             ("C-004", "A7")} <= refusal_checks(rep)
+
+
+def test_door_flags_command_clause_pending_harness():
+    """run_door must flow command clauses through A3 via runner helpers."""
+    rep = door(contract(clause(
+        acceptance={"command": "tipsy -5 >/dev/null 2>&1; test $? -eq 2",
+                    "expect": "exit 2"})))
+    assert len(rep.admitted) == 1
+    flags = {(f.clause_id, f.check, f.flag) for f in rep.flags}
+    assert ("C-001", "A3", "PENDING-HARNESS") in flags
+
+
+def test_door_flags_test_overlap_both_ways():
+    rep = door(contract(
+        clause(id="C-001", acceptance={"test": "tests/shared.py::test_s"}),
+        clause(id="C-002", obligation="The tool MUST NOT crash.",
+               acceptance={"test": "tests/shared.py::test_s"}),
+    ))
+    overlaps = {f.clause_id for f in rep.flags if f.flag == "OVERLAP"}
+    assert overlaps == {"C-001", "C-002"}
+
+
+def test_door_metric_scope_no_false_overlap():
+    """mdtodo C-011/C-012 pattern: same script, disjoint metric labels."""
+    rep = door(contract(
+        clause(id="C-001", obligation="Scanning MUST keep peak resident memory under 64 MB.",
+               acceptance={"metric": "scripts/bench.sh", "threshold": "peak RSS < 64 MB"}),
+        clause(id="C-002", obligation="Scanning MUST finish in under 5 s.",
+               acceptance={"metric": "scripts/bench.sh", "threshold": "wall clock < 5 s"}),
+    ))
+    assert not [f for f in rep.flags if f.flag == "OVERLAP"]
+
+
+def test_door_thin_evidence_flag():
+    rep = door(contract(clause(
+        risk="high", evidence_required=["test"])))
+    assert any(f.flag == "THIN-EVIDENCE" and f.check == "A9" for f in rep.flags)
