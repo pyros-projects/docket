@@ -96,12 +96,14 @@ def cmd_check(args) -> int:
         return 2
 
     failures = 0
+    matched = 0
     for contract in led.contracts():
         for clause in contract.clauses:
             if clause.status != "active":
                 continue
             if not args.all and clause.id != args.clause:
                 continue
+            matched += 1
             res = run_acceptance(clause.acceptance, args.root, led.runner_template)
             if res.result in ("green", "red"):
                 led.append_record(clause.id, "check", {
@@ -112,6 +114,11 @@ def cmd_check(args) -> int:
                 failures += 1
             if not args.quiet:
                 print(check_line(clause, res))
+
+    if not args.all and matched == 0:
+        print(f"docket check: no active clause {args.clause!r} in any contract",
+              file=sys.stderr)
+        return 2
 
     # stale clauses fail CI too (concepts/02 §4: any broken/stale clause fails the build)
     from docket.state import derive_views

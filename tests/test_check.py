@@ -38,6 +38,12 @@ def test_check_pending_harness_not_red(ledger_root, capsys):
     assert "PENDING-HARNESS" in out
 
 
+def test_check_unknown_clause_errors(ledger_root, capsys):
+    code, out, err = run_cli(["check", "C-999"], ledger_root, capsys)
+    assert code == 2
+    assert "C-999" in err and "no active clause" in err
+
+
 def test_check_human_routes_to_review(ledger_root, capsys):
     p = ledger_root / ".contracts/demo.contract.yaml"
     p.write_text(p.read_text().replace(
