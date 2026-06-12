@@ -21,6 +21,12 @@ Sequence after sign-off:
    fulfillment loop, watch the four refutation conditions (second spec
    reality, ledger drift, evidence decay, verdict fatigue).
 
+Parallel work item (added 2026-06-12, Pyro): build the docket-emitting SFD
+variant. Source material copied into `.agents/skills/surface-first-development/`
+(provenance + the 4-point delta in its UPSTREAM.md); upstream 0.7 spec
+copied to `docs/upstream/`. Variant is developed here against the door,
+eventual home is limitless (producer side).
+
 Watch items: docker-typo annoyance in practice; whether A4's MUST-pedantry
 or A6's number-demands annoy real authoring (Pyro flagged the question);
 whether verdict:human becomes a lazy-clause backdoor (count them).
