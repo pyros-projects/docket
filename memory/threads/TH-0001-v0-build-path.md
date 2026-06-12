@@ -80,7 +80,7 @@ review captured for /distill.
 Watch items: docker-typo annoyance in practice; whether A4's MUST-pedantry
 or A6's number-demands annoy real authoring (Pyro flagged the question);
 whether verdict:human becomes a lazy-clause backdoor (count them);
-guardian Goodharting (Pyro, 2026-06-13): the hollow-oracle attack — agent
+guardian Goodharting (Pyro, 2026-06-12 late): the hollow-oracle attack — agent
 authors both work and harness, test always passes, ledger green over broken
 reality. Mechanically undetectable by design (boundary discipline). v0
 defenses: first-verdict-reads-the-harness discipline, A9 multi-kind
