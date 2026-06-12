@@ -12,11 +12,18 @@ updated: '2026-06-12'
 are amortized authority (few human decisions, mechanically enforced many
 times). Named failure mode to never recreate: "no second spec reality."
 
-**State (2026-06-12):** concept phase complete. Four concept docs in
-`docs/concepts/` converged through a full-day three-way conversation
-(Pyro + Claude Fable 5 + Codie GPT-5.4) plus two SFD passes (courtroom
-surface; schema + door policy). No code. Pyro has NOT yet signed off on the
-v0 scope cut in `03` — that is the open gate.
+**State (2026-06-12, end of founding day):** concept phase complete AND the
+producer side is built and verified. Four concept docs converged (full-day
+three-way conversation, Pyro + Claude Fable 5 + Codie GPT-5.4, two SFD
+passes). The Accord reconciliation (DC-0002) merged Codie's parallel draft:
+door is A1–A9, rejections three-typed, `docket audit` in scope. The
+**docket-emitting SFD variant** in `.agents/skills/surface-first-development/`
+graduated the dojo (baseline 3/10 → pressure 10/10 → holdout 10/10; record
+at `docs/dojo/sfd-docket-variant-record.md`, full run artifacts in
+`docs/dojo/runs/` — the graduation contract files there are valid door
+fixtures). Flock-as-demo is ruled out; fixtures come from variant runs.
+The docket TOOL has no code yet. Pyro has NOT yet signed off on the v0
+scope cut in `03` — that is the open gate.
 
 **Where this came from:** reading flock `feat/skills` `.sfd/` artifacts →
 "SFD produces contracts, not specs" (Pyro) → decide-vs-score correction →

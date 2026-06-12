@@ -178,7 +178,7 @@ $ docket check --all --quiet ; echo $?
 | `check` | green | no acceptance harness → pending-harness | FAIL + drift naming | per-clause results | — |
 | `review` | accept | nothing to review → say so | reject w/ typed reason | failure report menu | stale rev → re-verdict notice |
 | `amend`/`sign` | rev bump | — | admission re-check fails → draft rejected | partial invalidation listed | concurrent draft → refuse second draft |
-| `import`/`add` | admitted | empty file → noop + warning | refusals A1–A7 | flags | duplicate IDs refused |
+| `import`/`add` | admitted | empty file → noop + warning | refusals A1–A9 | flags | duplicate IDs refused |
 | `tasks`/`file` | next task | all green → "docket clear" | malformed bundle refused | — | rev mismatch → refile |
 
 Deferred cells (acknowledged, not blocking concept convergence): watch

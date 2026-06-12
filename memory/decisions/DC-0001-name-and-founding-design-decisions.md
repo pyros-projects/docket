@@ -31,6 +31,8 @@ Accepted cost: typo adjacency to `docker`.
    database; revs explicit in-file).
 3. Door policy A1–A7 at admission; refuse vs flag semantics;
    `--sign-unanchored` override is legal but signed and recorded.
+   *(Historical: extended to A1–A9 same day by the Accord reconciliation —
+   see DC-0002. This entry records the founding state.)*
 4. MUST/MUST NOT only in v0 — SHOULD refused ("decide or defer").
 5. `verdict: human` clauses are a feature: judgment made explicit and
    countable, never hidden in fake mechanical acceptance.
