@@ -10,21 +10,29 @@ Read `00`–`02` first.
 **In:**
 
 - `.contracts/` format per `01` (schema, four clause archetypes)
-- `docket import` / `docket add` — the door, checks A1–A7, refuse/flag
-  semantics, `--sign-unanchored` override
+- `docket import` / `docket add` — the Accord (door checks A1–A9),
+  refuse/flag semantics, `--sign-unanchored` override
 - `docket check [clause|--all]` — conformance with drift naming, exit codes
 - `docket status` — derived state, the glance
+- `docket audit` — coverage views (surface cells, failure states, NFRs,
+  risk/evidence match); makes incompleteness inspectable
 - `docket review` — verdicts on evidence bundles and failure reports,
-  typed rejection (work defect / clause defect), per-clause calibration
+  typed rejection (work / evidence / clause defect), per-clause calibration
 - `docket amend` / `sign` / `add` — the legislature: draft → re-admission →
   signature → rev bump → evidence invalidation
 - `docket tasks --next [--json]` and `docket file` — the agent surface
 - Single authority (one signer). Python, file-native, no daemon, no DB.
 
 **Out (deferred until evidence demands them):** multi-party authority,
-severity tiers / SHOULD clauses, clause dependency edges, watch/notify
-modes, TUI/HTML boards, multi-repo dockets, CI integration sugar beyond
-exit codes, any producer- or consumer-specific integration.
+SHOULD/advisory clauses, validator-role schema fields, clause dependency
+edges, watch/notify modes, TUI/HTML boards, multi-repo dockets, CI
+integration sugar beyond exit codes, any producer- or consumer-specific
+integration.
+
+**Sequencing option (from Accord's v0):** build read-mostly first —
+import/audit/check/status before review/amend/sign — if the build wants an
+even cheaper first falsification rung. The full courtroom remains the v0
+definition of done either way.
 
 ## v0 acceptance — written as a docket contract (recursive fixture)
 
@@ -68,10 +76,10 @@ clauses:
 
   - id: D0-005
     obligation: >
-      A rejection MUST record a typed reason (work-defect | clause-defect)
-      and clause-defect counts MUST be queryable per clause.
+      A rejection MUST record a typed reason (work-defect | evidence-defect
+      | clause-defect) and clause-defect counts MUST be queryable per clause.
     acceptance: {test: tests/test_review.py::test_typed_rejection_calibration}
-    anchors: [{decision: concept-01-calibration}]
+    anchors: [{decision: concept-01-calibration}, {decision: DC-0002-accord-merge}]
 
   - id: D0-006
     obligation: >

@@ -65,7 +65,7 @@ clauses:
     anchors:
       - surface: "skill-attach × loading"
 
-  # Archetype 3: non-surface horse (incident-born)
+  # Archetype 3: non-surface horse (incident-born), high-risk
   - id: C-012
     obligation: >
       DLQ replay MUST be idempotent — replaying the same batch twice
@@ -74,6 +74,10 @@ clauses:
       test: tests/pipeline/test_replay_idempotent.py
     anchors:
       - incident: postmortem-2026-06-14-dlq-dupes
+    risk: high                       # data-loss class → A9 wants ≥2 evidence kinds
+    evidence_required: [test, trace]
+    scope:
+      excludes: ["bulk import (separate validation path)"]
 
   # Archetype 4: human-verdict negative clause
   - id: C-013
@@ -98,11 +102,26 @@ clauses:
 | `status` | no | `active` (default) · `deferred` · `retired` (retired ≠ deleted; history preserved) |
 | `notes` | no | residuals and known limits (e.g. "token estimation ±15%, uncontracted") |
 
-Deliberately absent (v0 YAGNI, revisit only with evidence of need):
-severity tiers, `SHOULD`/advisory clauses, per-clause owners, multi-party
-authorities, dependency edges between clauses.
+Adopted from Accord in lightweight form: optional `risk: low|medium|high`
+(its only mechanical effects: `evidence_required` defaults and the A9
+flag), optional `evidence_required:` (list of evidence kinds a bundle must
+contain), optional `scope: {applies_to, excludes}` (prevents
+scope-lawyering at verdict time). Lifecycle vocabulary also adopted:
+**validated** (admitted through the Accord) ≠ **proven** (green evidence at
+current rev) — a clause can be law and unproven.
 
-## The door policy (admission checks A1–A7)
+Deliberately absent (v0 YAGNI, revisit only with evidence of need):
+per-clause validator-role fields (see signing checklist below — the five
+questions are asked, not stored), `SHOULD`/advisory clauses, per-clause
+owners, multi-party authorities, dependency edges between clauses.
+
+## The Accord — door policy (admission checks A1–A9)
+
+The door policy has a name: **the Accord** — what it admits has, literally,
+reached accord. The name and the door's strengthened form come from Codie's
+parallel draft (`~/projects/agents/accord`, reconciled into Docket
+2026-06-12 — see DC-0002): Docket won as the product, Accord survives as
+the doctrine that decides what becomes law.
 
 Run by `docket import` / `docket add`. Two outcome classes: **refuse**
 (clause does not enter) and **flag** (clause enters carrying an obligation
@@ -117,6 +136,8 @@ to resolve).
 | A5 | overlap: same acceptance target claimed twice with different expectations | **flag** `OVERLAP` | "resolve before first verdict" |
 | A6 | qualitative performance words (fast, reliable, scalable, ...) require numbers | refuse | "give me a number, a test, or defer the clause" |
 | A7 | schema validity, unique IDs | refuse | plain validation error |
+| A8 | atomicity: exactly one obligation per clause | refuse | "two laws in one clause — split them" |
+| A9 | risk/evidence match: `risk: high` clauses need `evidence_required` ≥ 2 kinds | **flag** `THIN-EVIDENCE` | "a data-loss invariant deserves more than one test's word" |
 
 Two rationale notes that future maintainers will want:
 
@@ -158,14 +179,39 @@ going silent (see `02-surfaces.md`, dead-loop flow).
 - Evidence bundles are valid **against a rev**. Amending a clause bumps the
   file rev and invalidates that clause's bundles → re-verdict required only
   where affected.
-- Rejecting a bundle requires a reason, and the reason is typed:
-  **work defect** (the work missed) or **clause defect** (the work satisfied
-  the clause, but the clause was wrong). Clause defects accumulate as
-  **per-clause calibration** — defects per verdict, the contract's own
-  quality metric. A clause that survives ten verdicts unamended is validated
-  in the only sense that matters; a clause with 2 defects in 5 verdicts is
-  the worst law on the books and says so in `status`.
-- Nobody validates contracts upfront beyond the door. Form is machine-checked
-  at admission; content fidelity is *signed* (an authority act, not a
-  score); sufficiency is validated by use. "Top-notch contracts" decompose
-  into exactly those three, and only the first can be front-loaded.
+- Rejecting a bundle requires a reason, and the reason is typed three ways
+  (the third stolen from Accord): **work defect** (the implementation missed
+  the clause), **evidence defect** (the work may be fine, but the bundle did
+  not prove the claim), **clause defect** (the work satisfied the clause,
+  but the clause was wrong). Each type calibrates a different thing: work
+  defects measure the implementation, evidence defects measure the *filing
+  agent's rigor*, clause defects measure the law itself. Clause defects
+  accumulate as **per-clause calibration** — defects per verdict, the
+  contract's own quality metric. A clause that survives ten verdicts
+  unamended is validated in the only sense that matters; a clause with 2
+  defects in 5 verdicts is the worst law on the books and says so in
+  `status`.
+- Validation is layered, and only the first layer can be front-loaded —
+  but that layer should be as strong as mechanization allows (Codie's
+  correction to an earlier, too-relaxed "nobody validates upfront"
+  formulation): **form** is machine-checked at the Accord (A1–A9, now
+  including atomicity, risk/evidence match, and a coverage report);
+  **content fidelity** is *signed* (an authority act, not a score);
+  **sufficiency** is validated by use (calibration, amendments).
+
+- **The signing checklist** (Accord's five validator roles, demoted from
+  schema fields to questions — in a solo-authority world they all resolve
+  to the same person, and "desire" is decided, not validated). Before
+  signing a rev, the authority walks: *Desire* — is this the behavior we
+  actually want? *Domain* — is this true in the real domain? *Feasibility*
+  — can this be built and maintained within constraints? *Oracle* — how do
+  we know pass/fail? *Risk* — is this validation depth enough for the cost
+  of being wrong? The checklist is printed by `docket sign`; the answers
+  are the signature's due diligence, not ledger state.
+
+- **Coverage is inspectable, not provable** (Accord's completeness stance,
+  adopted verbatim in spirit): admission and `docket audit` emit coverage
+  views — surface cells covered/uncovered, failure-state coverage, NFR
+  coverage, deferred gaps. The contract set is good enough when the
+  uncovered regions are *visible* and the authority signs them as accepted
+  uncertainty.

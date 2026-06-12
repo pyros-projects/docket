@@ -12,6 +12,12 @@ updated: '2026-06-12'
 Open gate: Pyro has not yet reviewed/signed the four concept docs (notably
 the v0 scope cut in docs/concepts/03).
 
+2026-06-12 (later): Accord fork reconciled per Codie's verdict — see
+DC-0002. Door is now A1–A9 ("the Accord"), rejections are three-typed,
+`docket audit` added to v0, risk/evidence_required/scope fields adopted
+lightweight. Concept docs updated in place; review gate above still open
+and now covers the merged state.
+
 Sequence after sign-off:
 1. claude-knowledge crossings: sketches/docket.md + projects/docket.md.
 2. Implementation plan against docs/concepts/03 (writing-plans).

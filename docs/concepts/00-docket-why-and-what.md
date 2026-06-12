@@ -86,11 +86,16 @@ Contracts reach the docket from many producers ("horses"): an SFD
 prototype-interview (the richest one — see the SFD 0.7 spec in the limitless
 repo), incident postmortems, regulation, legacy behavior, API compatibility,
 SLAs, existing tests. Docket deliberately does not care which horse a
-contract arrived on. What it cares about is its **door policy** — the
-admission checks every clause must pass regardless of origin
+contract arrived on. What it cares about is its door policy — named **the
+Accord** — the admission checks every clause must pass regardless of origin
 (`01-contract-schema-and-door-policy.md`). The door, not the producer,
 defines what a good contract is. This is what disciplines the producers:
 the consumer's standard teaches SFD (and every other horse) what to emit.
+
+(The name honors the reconciled fork: Codie's parallel draft of this
+product, *Accord*, centered contract quality as its thesis. Docket won as
+the product — "you can feel the product," his words — and Accord survives
+as the doctrine of the door. DC-0002 records the merge.)
 
 ## Boundary-artifact discipline (what Docket must never become)
 

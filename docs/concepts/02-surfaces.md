@@ -53,6 +53,22 @@ C-006 error taxonomy ..................................... FAIL
 the failing assertion. Red states must always print their two exits:
 change the work, or change the law.
 
+### Coverage (the second glance — adopted from Accord)
+
+```
+$ docket audit
+COVERAGE — flock feat/skills                              rev 3
+  surface cells:   34/40 covered · 4 deferred (signed) · 2 UNCOVERED
+     UNCOVERED:    skill-attach × offline · script-run × rate-limit
+  failure states:  9/11 contracted
+  NFR targets:     3/3 numbered
+  risk:            2 high-risk clauses · evidence_required ≥2 on both ✔
+
+  → uncovered regions are visible. Contract them, defer them signed,
+    or accept the dark. The audit does not pretend completeness —
+    it makes incompleteness inspectable.
+```
+
 ### Moment 2: the verdict
 
 ```
