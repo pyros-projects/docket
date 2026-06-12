@@ -51,6 +51,22 @@ Falsifier note (same evening): tipsy's signed bundle (16 admissible
 clauses, docs/dojo/runs/pressure-tipsy/) is the leading candidate for
 docket v0's first real fulfillment run — Phase 6 as fixture resurrection.
 
+2026-06-12 (night): GPT-Pro review of the mdtodo graduation bundle, relayed
+by Pyro — verdict "a very strong first real specimen." Names the round-trip
+pattern **blind surface replay** (contract reconstructability test) and
+reframes the SFD bundle as a *prosecution file* (contract = what agents
+consume; bundle = how humans audit the law's birth). Five pressure points
+filed as review-gate inputs in memory/inbox/IN-20260612-7d2c: PENDING-HARNESS
+visibility, signed-vs-pre-signing provenance mismatch in the mdtodo fixture
+(verified real — contract.yaml signed block vs decision-log line 68), A8
+atomicity-by-gestalt doctrine (C-003 test case), open questions as a
+first-class audit view ("signed darkness"), named benchmark-environment
+artifact for NFR evidence. Proposes mdtodo as the golden *import* fixture
+for D0-007 — complements tipsy as the *fulfillment-run* candidate (import
+fixture ≠ fulfillment case). KG layer-crossings done the same night:
+sketches/docket.md + projects/docket.md dossier filed in claude-knowledge,
+review captured for /distill.
+
 Watch items: docker-typo annoyance in practice; whether A4's MUST-pedantry
 or A6's number-demands annoy real authoring (Pyro flagged the question);
 whether verdict:human becomes a lazy-clause backdoor (count them).
