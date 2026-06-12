@@ -74,6 +74,26 @@ def test_a7_schema_error_refused():
     assert ("C-001", "A7") in refusal_checks(rep)
 
 
+def test_a7_unhashable_id_refused_not_crash():
+    rep = door(contract(clause(id=["C-001"])))
+    assert ("C-001" not in {f.clause_id for f in rep.refusals} or True)  # no crash is the point
+    assert any(f.check == "A7" for f in rep.refusals)
+    assert rep.admitted == []
+
+
+def test_a6_metric_acceptance_exempt_from_raw_dict():
+    rep = door(contract(clause(
+        obligation="Startup MUST be fast.",
+        acceptance={"metric": "scripts/bench.sh", "threshold": "p95 < 50ms"})))
+    assert rep.refusals == []
+
+
+def test_a8_newline_dash_list_refused():
+    rep = door(contract(clause(
+        obligation="The tool MUST handle:\n- input files\n- directories")))
+    assert ("C-001", "A8") in refusal_checks(rep)
+
+
 def test_refusals_a1_a4_a6_a7():
     """D0-001: door refuses missing acceptance and missing/multiple MUST."""
     rep = door(contract(

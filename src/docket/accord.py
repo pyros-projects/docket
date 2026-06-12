@@ -71,14 +71,15 @@ def _check_a8(c: dict) -> Finding | None:
     return None
 
 
-def _check_a6(c: dict, parsed: Clause | None) -> Finding | None:
-    ob = str(c.get("obligation", "")).lower()
-    words = set(re.findall(r"[a-z]+", ob))
+def _check_a6(c: dict) -> Finding | None:
+    ob = str(c.get("obligation", ""))
+    words = set(re.findall(r"[a-z]+", ob.lower()))
     if not (words & QUALITATIVE_WORDS):
         return None
-    if re.search(r"\d", str(c.get("obligation", ""))):
+    if re.search(r"\d", ob):
         return None
-    if parsed is not None and parsed.acceptance.kind == "metric":
+    acc = c.get("acceptance")
+    if isinstance(acc, dict) and "metric" in acc:
         return None  # the number lives in the threshold
     return Finding("A6", c.get("id"), "refuse", MESSAGES["A6"])
 
@@ -89,6 +90,8 @@ def run_door(data: dict, root: Path, sign_unanchored: str | None = None) -> Door
     seen_ids: dict[str, int] = {}
     for c in clauses:
         cid = c.get("id") if isinstance(c, dict) else None
+        if not isinstance(cid, str):
+            cid = None
         seen_ids[cid] = seen_ids.get(cid, 0) + 1
 
     parsed_ok: list[tuple[dict, Clause]] = []
@@ -97,6 +100,8 @@ def run_door(data: dict, root: Path, sign_unanchored: str | None = None) -> Door
             rep.refusals.append(Finding("A7", None, "refuse", f"clause is not a mapping: {raw!r}"))
             continue
         cid = raw.get("id")
+        if not isinstance(cid, str):
+            cid = None  # non-str id falls through to pydantic validation -> A7
         # A7: duplicate ids
         if cid is not None and seen_ids.get(cid, 0) > 1:
             rep.refusals.append(Finding("A7", cid, "refuse", f"duplicate clause id {cid}"))
@@ -120,7 +125,7 @@ def run_door(data: dict, root: Path, sign_unanchored: str | None = None) -> Door
             rep.refusals.append(f); continue
         if (f := _check_a8(raw)):
             rep.refusals.append(f); continue
-        if (f := _check_a6(raw, parsed)):
+        if (f := _check_a6(raw)):
             rep.refusals.append(f); continue
         # A2: anchors
         if not parsed.anchors:
@@ -132,9 +137,10 @@ def run_door(data: dict, root: Path, sign_unanchored: str | None = None) -> Door
                 continue
         parsed_ok.append((raw, parsed))
 
+    cohort = [p for _, p in parsed_ok]
     for raw, parsed in parsed_ok:
         rep.admitted.append(parsed)
-        rep.flags.extend(flag_checks(parsed, [p for _, p in parsed_ok], root))
+        rep.flags.extend(flag_checks(parsed, cohort, root))
     return rep
 
 
