@@ -90,6 +90,19 @@ def test_no_stored_state(ledger_root, capsys):
     assert fingerprint() == before, "a read surface wrote to disk"
 
 
+def test_freshness_handles_naive_and_unparseable_stamps():
+    from docket.state import ClauseView, freshness
+    from docket.model import Clause
+    cl = Clause.model_validate({"id": "C-001", "obligation": "X MUST hold.",
+                                "acceptance": {"test": "t.py::t"},
+                                "anchors": [{"decision": "D-001"}]})
+    views = [ClauseView(clause=cl, state="unstarted", last_activity="2026-06-12T10:00:00"),
+             ClauseView(clause=cl, state="unstarted", last_activity="garbage"),
+             ClauseView(clause=cl, state="unstarted", last_activity=None)]
+    out = freshness(views)
+    assert out.endswith(("h", "d")) and not out.startswith("-")
+
+
 def test_no_state_keys_in_law(ledger_root):
     law = (ledger_root / ".contracts/demo.contract.yaml").read_text()
     for key in ("state:", "green:", "holding:", "broken:"):

@@ -23,6 +23,8 @@ def build_parser() -> argparse.ArgumentParser:
     chk.add_argument("--all", action="store_true")
     chk.add_argument("--quiet", action="store_true")
 
+    sub.add_parser("status", help="the glance — derived state of every clause")
+
     return p
 
 
@@ -31,7 +33,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.cmd is None:
         print("docket: no command given (try: docket status)", file=sys.stderr)
         return 2
-    return {"import": cmd_import, "check": cmd_check}[args.cmd](args)
+    return {"import": cmd_import, "check": cmd_check, "status": cmd_status}[args.cmd](args)
 
 
 def cmd_import(args) -> int:
@@ -131,6 +133,22 @@ def cmd_check(args) -> int:
                           f"{contract.rev}; re-verdict needed")
 
     return 1 if failures else 0
+
+
+def cmd_status(args) -> int:
+    from docket.render import ONBOARDING, status_report
+    from docket.state import derive_views, freshness
+    from docket.storage import Ledger
+
+    led = Ledger(args.root)
+    contracts = led.contracts()
+    if not contracts:
+        print(ONBOARDING)
+        return 0
+    for contract in contracts:
+        views = derive_views(contract, led, args.root)
+        print(status_report(contract, views, freshness(views)))
+    return 0
 
 
 def entry() -> None:

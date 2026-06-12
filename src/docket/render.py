@@ -39,6 +39,36 @@ def check_line(clause, res) -> str:
     return "\n".join(body)
 
 
+def status_report(contract, views, fresh: str) -> str:
+    n_amend = max(0, contract.rev - 1)
+    head = f"DOCKET — {contract.contract}"
+    lines = [f"{head:<52}rev {contract.rev} ({n_amend} amendment{'s' * (n_amend != 1)})",
+             f"source: {contract.source}", ""]
+    lines.append(f"  {'CLAUSE':<38}{'EVIDENCE':<18}STATE")
+    for v in views:
+        name = f"{v.clause.id} {short_name(v.clause)}"[:36]
+        state = f"{GLYPH[v.state]} {v.state if v.state != 'stale' else 're-verdict'}"
+        # outstanding Accord flags never hide behind a stronger state (decision 15);
+        # skip the flag already shown AS the state (e.g. pending-harness/overlap)
+        extra = [f for f in v.flags if f.lower() != v.state]
+        if extra:
+            state += " " + " ".join(f"⚑{f}" for f in extra)
+        lines.append(f"  {name:<38}{v.evidence_summary[:16]:<18}{state}")
+    lines.append("")
+    n_review = sum(1 for v in views if v.state == "review")
+    n_broken = sum(1 for v in views if v.state == "broken")
+    lines.append(f"  {n_review} awaiting your verdict · {n_broken} broken · "
+                 f"evidence freshness: {fresh}")
+    if n_broken:
+        lines.append("")
+        lines.append(TWO_EXITS)
+    return "\n".join(lines)
+
+
+ONBOARDING = ("no contracts in .contracts/ — this docket is empty.\n"
+              "  bring law to the courtroom:  docket import <file.contract.yaml>")
+
+
 def import_report(name: str, rev: int, source: str, signed: list,
                   rep: DoorReport, dest: str) -> str:
     lines = [f"DOCKET IMPORT — {name} rev {rev}", f"source: {source}"]

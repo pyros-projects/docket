@@ -99,10 +99,20 @@ def _derive_one(clause: Clause, contract: Contract, led: Ledger, root: Path) -> 
 
 
 def freshness(views: list[ClauseView]) -> str:
-    stamps = [v.last_activity for v in views if v.last_activity]
+    stamps = []
+    for v in views:
+        if not v.last_activity:
+            continue
+        try:
+            ts = dt.datetime.fromisoformat(v.last_activity)
+        except ValueError:
+            continue
+        if ts.tzinfo is None:
+            ts = ts.astimezone()
+        stamps.append(ts)
     if not stamps:
         return "—"
-    newest = dt.datetime.fromisoformat(max(stamps))
-    age = dt.datetime.now(newest.tzinfo) - newest
+    newest = max(stamps)
+    age = max(dt.datetime.now(newest.tzinfo) - newest, dt.timedelta(0))
     h = int(age.total_seconds() // 3600)
     return f"{h}h" if h < 48 else f"{h // 24}d"
