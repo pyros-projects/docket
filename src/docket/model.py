@@ -57,7 +57,7 @@ class AcceptanceCommand(_Strict):
         return "command"
 
     @property
-    def target(self) -> str:
+    def target(self) -> str:  # first shell token only — NOT authoritative for A3; use runner.command_harness_missing
         return self.command.split()[0]
 
 
