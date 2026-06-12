@@ -66,7 +66,8 @@ class Ledger:
         d.mkdir(parents=True, exist_ok=True)
         n = len(list(d.glob(f"{kind}-*.json"))) + 1
         p = d / f"{kind}-{n:03d}.json"
-        payload.setdefault("at", now_iso())
+        if "at" not in payload:
+            payload = dict(payload, at=now_iso())
         p.write_text(json.dumps(payload, indent=2) + "\n")
         return p
 
@@ -81,10 +82,13 @@ class Ledger:
         return [json.loads(p.read_text()) for p in sorted(d.glob("rev-*.json"))]
 
     def append_amendment(self, contract: str, payload: dict) -> Path:
+        if "rev" not in payload:
+            raise ValueError("append_amendment: payload missing 'rev' key")
         d = self._amend_dir(contract)
         d.mkdir(parents=True, exist_ok=True)
         seq = len(list(d.glob("rev-*.json"))) + 1
-        payload.setdefault("at", now_iso())
+        if "at" not in payload:
+            payload = dict(payload, at=now_iso())
         p = d / f"rev-{payload['rev']:03d}-seq-{seq:03d}.json"
         p.write_text(json.dumps(payload, indent=2) + "\n")
         return p
@@ -100,8 +104,12 @@ class Ledger:
         p = self.dir / "runners.yaml"
         if p.exists():
             data = _yaml.load(p.read_text()) or {}
-            return (data.get("runners") or {}).get(kind, defaults[kind])
-        return defaults[kind]
+            tpl = (data.get("runners") or {}).get(kind, defaults.get(kind))
+        else:
+            tpl = defaults.get(kind)
+        if tpl is None:
+            raise ValueError(f"runner_template: no template for kind {kind!r}")
+        return tpl
 
     def coverage_manifest(self) -> dict | None:
         p = self.dir / "coverage.yaml"

@@ -35,6 +35,7 @@ def run_cli(argv: list[str], root: Path, capsys) -> tuple[int, str, str]:
 
 
 def write_history(root: Path, clause: str, name: str, payload: dict) -> Path:
+    """Plant a raw evidence file (bypasses Ledger numbering — use for seeding only)."""
     d = root / ".contracts" / "evidence" / clause
     d.mkdir(parents=True, exist_ok=True)
     p = d / name
