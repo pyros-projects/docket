@@ -52,10 +52,24 @@ candidates for later — plans build against the concepts as approved.
    (plan 1: ledger/door/state read-mostly; plan 2: courtroom + recursive
    fixture), Codie review applied (1 blocker + 5 should-fix, all
    incorporated — see plan "Design decisions" 1–26).
-4. Execute plan 1 → Codie door review → execute plan 2 → recursive fixture
-   green → Pyro signs rev1 (`docket sign rev1 --by pyro`).
-5. Falsifier run on tipsy's signed bundle (one real fulfillment loop, watch
-   the four refutation conditions).
+4. ~~Execute plan 1 → Codie door review~~ DONE 2026-06-13 (night session):
+   **branch `v0`, 19 commits, 73 tests green.** Subagent-driven execution,
+   every task spec+quality reviewed with fixes (review trail in git log).
+   Execution reorder 4→6→5 (runner before import CLI) eliminated the
+   plan's stub dance. Both graduation bundles import clean: mdtodo 24/0,
+   tipsy 16/0, zero door recalibration needed. Codie gate verdict: NO
+   BLOCKERS, foundation safe for Plan 2; his five should-fixes all landed
+   (threshold form refused at door, unit-strict metric matching,
+   ledger-wide A5, all-refused reports cite checks, file clause-mismatch
+   refused). Door also grew cross-contract A7 (clause ids per-project
+   monotonic — concepts/01's own rule, now mechanical).
+5. Execute plan 2 (courtroom: review/amend/sign + recursive fixture) —
+   FRESH SESSION recommended. Carry-ins for Plan 2: verdict.bundle stores
+   filename STEM (pinned in state.py comment); D0-004 surface test should
+   cover stale/stuck footers too (Codie nit); sign gate must honor the
+   runner trust model (signature is the boundary).
+6. Recursive fixture green → Pyro signs rev1 → falsifier run on tipsy's
+   signed bundle (four refutation conditions).
 
 **Related vault material (claude-knowledge):** capture
 `2026-06-12-sfd-produces-contracts-not-specs-three-way-convergence` (queued,
