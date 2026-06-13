@@ -7,6 +7,7 @@ the door's output is the import-time report.
 from __future__ import annotations
 
 import re
+from collections.abc import Iterable
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -85,7 +86,8 @@ def _check_a6(c: dict) -> Finding | None:
     return Finding("A6", c.get("id"), "refuse", MESSAGES["A6"])
 
 
-def run_door(data: dict, root: Path, sign_unanchored: str | None = None) -> DoorReport:
+def run_door(data: dict, root: Path, sign_unanchored: str | None = None,
+             extra_cohort: "Iterable[Clause]" = ()) -> DoorReport:
     rep = DoorReport()
     clauses = data.get("clauses") or []
     seen_ids: dict[str, int] = {}
@@ -128,6 +130,16 @@ def run_door(data: dict, root: Path, sign_unanchored: str | None = None) -> Door
             rep.refusals.append(f); continue
         if (f := _check_a6(raw)):
             rep.refusals.append(f); continue
+        # A1 (form): a metric threshold must carry the parseable grammar
+        if parsed.acceptance.kind == "metric":
+            from docket.runner import parse_threshold
+            try:
+                parse_threshold(parsed.acceptance.threshold)
+            except ValueError:
+                rep.refusals.append(Finding("A1", parsed.id, "refuse",
+                    f"threshold {parsed.acceptance.threshold!r} has no comparator+number — "
+                    + MESSAGES["A6"]))
+                continue
         # A2: anchors
         if not parsed.anchors:
             if sign_unanchored:
@@ -139,9 +151,10 @@ def run_door(data: dict, root: Path, sign_unanchored: str | None = None) -> Door
         parsed_ok.append((raw, parsed))
 
     cohort = [p for _, p in parsed_ok]
+    full_cohort = cohort + list(extra_cohort)
     for raw, parsed in parsed_ok:
         rep.admitted.append(parsed)
-        rep.flags.extend(flag_checks(parsed, cohort, root))
+        rep.flags.extend(flag_checks(parsed, full_cohort, root))
     return rep
 
 

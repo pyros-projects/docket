@@ -99,3 +99,19 @@ def test_unit_mismatch_not_green(ledger_root):
         ledger_root, Ledger(ledger_root).runner_template)
     assert res.result == "red"
     assert "not found" in res.drift
+
+
+def test_unitless_line_not_judged_against_unit_threshold(ledger_root):
+    name = _script(ledger_root, "bench_bare.sh", 'echo "peak rss: 2"')
+    res = run_acceptance(
+        AcceptanceMetric(metric=f"./{name}", threshold="peak RSS < 64 MB"),
+        ledger_root, Ledger(ledger_root).runner_template)
+    assert res.result == "red" and "not found" in res.drift
+
+
+def test_unit_in_name_still_matches(ledger_root):
+    name = _script(ledger_root, "bench_named.sh", 'echo "peak_rss_mb: 41.2"')
+    res = run_acceptance(
+        AcceptanceMetric(metric=f"./{name}", threshold="peak RSS < 64 MB"),
+        ledger_root, Ledger(ledger_root).runner_template)
+    assert res.result == "green"

@@ -137,8 +137,13 @@ def run_acceptance(acc: Acceptance, root: Path,
         have = set(re.findall(r"[a-z0-9]+", m.group("name").lower()))
         if want & have:
             line_unit = m.group("unit").lower()
-            if unit and line_unit and line_unit != unit:
-                continue  # decision 2: unit mismatch = not the contracted metric
+            if unit:
+                name_has_unit = unit in have
+                if line_unit:
+                    if line_unit != unit:
+                        continue  # decision 2: unit mismatch = not the contracted metric
+                elif not name_has_unit:
+                    continue  # unit-bearing threshold needs a unit-bearing line
             value = float(m.group("num"))
             ok = _compare(value, op, bound)
             detail = f"{m.group('name').strip()} = {value} (threshold {op} {bound}{unit})"

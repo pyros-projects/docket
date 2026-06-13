@@ -93,3 +93,33 @@ def test_tipsy_pressure_bundle_imports_clean(tmp_path, capsys):
     assert code == 0
     assert "admitted: 16" in out
     assert "refused: 0" in out
+
+
+def test_a5_overlap_flags_across_contracts(ledger_root, capsys, tmp_path):
+    other = tmp_path / "other.contract.yaml"
+    other.write_text(
+        "contract: other\nrev: 1\nsource: t\nsigned: []\n"
+        "clauses:\n"
+        "  - id: C-800\n"
+        "    obligation: >\n      other MUST exit 0 on success.\n"
+        "    acceptance:\n      test: tests/test_demo.py::test_exit_zero\n"
+        "    anchors:\n      - decision: D-001\n")
+    code, out, err = run_cli(["import", str(other)], ledger_root, capsys)
+    assert code == 0
+    assert "OVERLAP" in out      # C-800 shares demo C-001's test nodeid
+
+
+def test_all_refused_import_still_cites_checks(tmp_path, capsys):
+    (tmp_path / ".contracts").mkdir()
+    bad = tmp_path / "hopeless.contract.yaml"
+    bad.write_text(
+        "contract: hopeless\nrev: 1\nsource: t\nsigned: []\n"
+        "clauses:\n"
+        "  - id: H-001\n"
+        "    obligation: >\n      The tool SHOULD be nice.\n"
+        "    acceptance:\n      test: tests/t.py::t\n"
+        "    anchors:\n      - decision: D-001\n")
+    code, out, err = run_cli(["import", str(bad)], tmp_path, capsys)
+    assert code == 2
+    assert "✘ H-001 [A4]" in out
+    assert not (tmp_path / ".contracts/hopeless.contract.yaml").exists()

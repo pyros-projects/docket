@@ -74,7 +74,9 @@ def cmd_import(args) -> int:
     # evidence/<clause>/ namespace depends on it, so A7 extends across contracts
     existing_ids = {cl.id: c.contract for c in led.contracts() for cl in c.clauses}
 
-    rep = run_door(data, args.root, sign_unanchored=args.sign_unanchored)
+    extra_cohort = [cl for c in led.contracts() for cl in c.clauses]
+    rep = run_door(data, args.root, sign_unanchored=args.sign_unanchored,
+                   extra_cohort=extra_cohort)
 
     collisions = [c for c in rep.admitted if c.id in existing_ids]
     for c in collisions:
@@ -84,6 +86,8 @@ def cmd_import(args) -> int:
     rep.flags = [f for f in rep.flags if f.clause_id not in {c.id for c in collisions}]
 
     if not rep.admitted:
+        print(import_report(name, data.get("rev", 0), str(data.get("source", "?")),
+                            [], rep, "(nothing written)"))
         print("docket import: no clauses admitted"
               + (" (file has no clauses)" if not data.get("clauses") else ""),
               file=sys.stderr)
@@ -230,6 +234,10 @@ def cmd_file(args) -> int:
     if not required <= set(payload):
         print(f"docket file: malformed bundle — missing {sorted(required - set(payload))}",
               file=sys.stderr)
+        return 2
+    if payload["clause"] != args.clause:
+        print(f"docket file: bundle names clause {payload['clause']!r} but you are "
+              f"filing under {args.clause!r} — refused", file=sys.stderr)
         return 2
     target = None
     for contract in led.contracts():

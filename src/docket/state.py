@@ -33,20 +33,22 @@ def _valid(rec: dict, rev_key: str, floor: int) -> bool:
 
 
 def derive_views(contract: Contract, led: Ledger, root: Path) -> list[ClauseView]:
+    cohort = [cl for c in led.contracts() for cl in c.clauses]
     views = []
     for clause in contract.clauses:
-        views.append(_derive_one(clause, contract, led, root))
+        views.append(_derive_one(clause, contract, led, root, cohort))
     return views
 
 
-def _derive_one(clause: Clause, contract: Contract, led: Ledger, root: Path) -> ClauseView:
+def _derive_one(clause: Clause, contract: Contract, led: Ledger, root: Path,
+                cohort: list[Clause]) -> ClauseView:
     floor = led.last_amend_rev(contract.contract, clause.id)
     bundles = [b for b in led.records(clause.id, "bundle") if _valid(b, "rev_at_filing", floor)]
     checks = [c for c in led.records(clause.id, "check") if _valid(c, "rev", floor)]
     verdicts = [v for v in led.records(clause.id, "verdict") if _valid(v, "rev", floor)]
     all_verdicts = led.records(clause.id, "verdict")  # calibration counts ALL history
 
-    flags = [f.flag for f in flag_checks(clause, list(contract.clauses), root)]
+    flags = [f.flag for f in flag_checks(clause, cohort, root)]
     defects = sum(1 for v in all_verdicts if v.get("rejection_type") == "clause-defect")
     cal = (defects, len(all_verdicts))
 

@@ -140,3 +140,9 @@ def test_door_thin_evidence_flag():
     rep = door(contract(clause(
         risk="high", evidence_required=["test"])))
     assert any(f.flag == "THIN-EVIDENCE" and f.check == "A9" for f in rep.flags)
+
+
+def test_a1_unparseable_metric_threshold_refused():
+    rep = door(contract(clause(
+        acceptance={"metric": "scripts/bench.sh", "threshold": "fast enough"})))
+    assert ("C-001", "A1") in refusal_checks(rep)

@@ -62,3 +62,12 @@ def test_file_malformed_refused(ledger_root, capsys, tmp_path):
     code, out, err = run_cli(["file", "C-001", "--bundle", str(b)], ledger_root, capsys)
     assert code == 2
     assert "malformed" in err
+
+
+def test_file_clause_mismatch_refused(ledger_root, capsys, tmp_path):
+    b = tmp_path / "bundle.json"
+    b.write_text(json.dumps({"clause": "C-002", "claim": "satisfied",
+                             "filed_by": "l", "rev_at_filing": 1, "evidence": []}))
+    code, out, err = run_cli(["file", "C-001", "--bundle", str(b)], ledger_root, capsys)
+    assert code == 2
+    assert "C-002" in err and "refused" in err
