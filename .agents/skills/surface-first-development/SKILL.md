@@ -1,6 +1,6 @@
 ---
 name: surface-first-development
-description: This skill should be used when the user wants to build, prototype, or reshape an app, tool, CLI, API, automation, or feature by starting from the interaction surface first. Responds to "let's build", "prototype this", "I have an idea for an app/tool", "show me what it would look like", "surface first", "SFD", "click dummy", "derive contracts", "docket contracts", "what would the UX be", or any request where the user describes what something should do without specifying architecture. Converges on a working prototype, then emits docket-admissible contracts — clause log during iteration, surface state inventory, .contracts/*.contract.yaml, self-admission against the Accord door checks (A1–A9), round-trip sufficiency test, and a seven-artifact Handoff Bundle.
+description: This skill should be used when the user wants to build, prototype, or reshape an app, tool, CLI, API, automation, workflow, requirements document, knowledge tree, policy, curriculum, argument outline, or other evaluable artifact before architecture. Responds to "let's build", "prototype this", "surface first", "SFD", "click dummy", "derive contracts", "docket contracts", "requirements as surface", "knowledge tree", "policy surface", or any request describing what should exist without specifying internals.
 ---
 
 # Surface-First Development
@@ -13,6 +13,7 @@ If anything in this skill feels unclear, underspecified, or in tension with a re
 
 - User says "let's build", "I want an app/tool/CLI/API that...", "I have an idea for..."
 - User describes a product, feature, or tool without specifying architecture or internals
+- User wants to converge a requirements document, knowledge tree/graph, policy/rule set, curriculum, argument outline, workflow map, or other artifact before implementation
 - User says "surface first", "click dummy", "show me what it would look like", "prototype this"
 - User says "SFD", "surface-first"
 - User wants to start a new project or feature and hasn't locked in a tech approach yet
@@ -20,9 +21,15 @@ If anything in this skill feels unclear, underspecified, or in tension with a re
 
 ## Purpose
 
-You are following the **Surface-First Development** methodology. The core principle: always start by building and iterating a working prototype of the outermost interaction layer, converge it with the user, derive contracts, then build inward.
+You are following the **Surface-First Development** methodology. The core principle: always start by building and iterating the outermost artifact the steering human can evaluate cheaply, converge it with the user, derive contracts, then build inward.
 
-Do NOT start with database schemas, backend architecture, API design, or infrastructure. Start with what the user will actually see, touch, type, or call.
+Do NOT start with database schemas, backend architecture, API design, or infrastructure. Start with what the user will actually see, touch, type, read, review, navigate, or sign.
+
+## What Counts as a Surface
+
+The surface is the outermost artifact the steering human can evaluate cheaply. A UI is one instance. So is a requirements document, a knowledge graph, a policy, an argument outline, a curriculum, a workflow map, or a contract clause set. The binding constraints are **concreteness** and **legibility to whoever steers** — not clickability, visualness, or software-ness.
+
+Visual and interactive artifacts are often the cheapest route to legibility, but they are not required. Pick the artifact the actual decision-maker can critique before internals are committed.
 
 ## Operating Stance
 
@@ -44,6 +51,8 @@ This prevents the failure mode where you barrel ahead on assumptions and the use
 
 The pattern applies everywhere — Phase 2 research directions, Phase 3 prototype concepts, Phase 4 iteration proposals, Phase 5 contract alternatives, Phase 6 slice ordering, Phase 7 hardening priorities. If you're about to make a significant directional choice, present options first.
 
+**First-response gate:** If the user asks to "prototype", "converge", "use SFD", or "surface-first" but has not already chosen a direction in this conversation, your first response MUST stop at 2-3 concrete directions plus your recommendation and an approval question. Do not self-select one direction. Do not produce a "provisional" full artifact. The word "prototype" is not permission to skip direction choice; it means propose prototype directions first.
+
 ## First Move
 
 When this skill is triggered:
@@ -51,11 +60,11 @@ When this skill is triggered:
 1. Identify the primary interaction surface.
 2. Explore the problem space (research or generate concept directions).
 3. Get user approval on a direction before building anything.
-4. Build the smallest believable prototype that covers the critical path.
+4. Build the smallest believable surface artifact that covers the critical path.
 5. Put it in front of the user quickly.
-6. Ask for critique of behavior and flow, not implementation.
+6. Ask for critique of behavior, structure, wording, coverage, flow, or evaluability — not implementation.
 
-Do not begin with architecture diagrams, schema design, backend planning, or large requirement questionnaires unless the user explicitly forces that order.
+Do not begin with architecture diagrams, schema design, backend planning, or large requirement questionnaires unless the user explicitly forces that order. For document, tree, policy, or curriculum surfaces, do **not** draft the full artifact as the first move; propose 2-3 concrete artifact directions and wait for approval first.
 
 ## Expected Artifact by Surface Type
 
@@ -66,6 +75,11 @@ Do not begin with architecture diagrams, schema design, backend planning, or lar
 | API / library | Example consumer code that shows the desired developer experience |
 | Data / ops workflow | Simulated runbook, monitoring view, or operator journey |
 | Agent / automation | Trigger-to-outcome walkthrough with realistic state transitions |
+| Requirements / spec surface | Candidate requirements shape plus acceptance-criteria pattern |
+| Knowledge base / graph | Tree or graph structure with example nodes and coverage map |
+| Policy / rule set | Rule-set shape with exceptions, examples, and conflict checks |
+| Argument / essay | Outline or claims map with counterarguments and evidence gaps |
+| Curriculum / training | Module map with exercises, evaluation gates, and coverage gaps |
 
 If you are only describing the artifact instead of producing it, you are probably not following SFD yet.
 
@@ -73,13 +87,17 @@ If you are only describing the artifact instead of producing it, you are probabl
 
 Humans are better at evaluating concrete proposals than writing abstract specs. Your job is to generate proposals fast so the human can react, critique, and steer. The human directs; you generate. Never ask the user to write a specification. Show them something and let them tell you what's wrong with it.
 
+The surface must be legible to the decision-maker. A compliance lead can critique a policy; a knowledge-base maintainer can critique a tree; a developer can critique consumer code; an end user can critique a UI. Choose the evaluable artifact for the steerer in front of you.
+
 ---
 
 ## The Process
 
 ### Phase 1: Identify the Surface
 
-Determine what type of interaction surface the project has. Ask the user ONLY if it's genuinely ambiguous.
+Determine the outermost evaluable artifact for the domain: the thing the steering human confronts and reacts to before internals are committed. Ask the user ONLY if the steering artifact or decision-maker is genuinely ambiguous.
+
+Software surfaces:
 
 | If the user wants... | The surface is... | You build... |
 |---|---|---|
@@ -88,6 +106,16 @@ Determine what type of interaction surface the project has. Ask the user ONLY if
 | An API or library | Developer experience | Example consumer/integration code |
 | A data pipeline | Operator workflow | Simulated deploy/monitor/debug session |
 | An automation/agent | Trigger-to-outcome flow | Scenario walkthrough |
+
+Knowledge/document surfaces:
+
+| If the user wants... | The surface is... | You build... |
+|---|---|---|
+| Requirements convergence | Requirements doc + acceptance criteria | 2-3 document shapes, then a draft artifact after approval |
+| Knowledge base | Tree/graph structure + coverage gaps | 2-3 taxonomy/graph directions with example nodes |
+| Policy/regulation | Rule set + exceptions/examples | 2-3 policy shapes with conflict/exception coverage |
+| Argument/essay | Claim ordering + evidence/counterargument map | 2-3 outline structures |
+| Curriculum/training | Module sequence + exercises/eval gates | 2-3 curriculum maps with coverage axes |
 
 ### Phase 2: Explore the Problem Space
 
@@ -151,16 +179,16 @@ Only now proceed to Phase 3.
 
 ### Phase 3: Generate Surface Proposal
 
-Build a working prototype of the surface immediately. Rules:
+Build a working prototype/proposal of the surface immediately after the user approves a direction. Rules:
 
-1. **Go fast, not deep.** Use mock data, placeholder logic, and simulated responses. The surface must look and feel real to interact with, but nothing behind it needs to work yet.
-2. **Make decisions.** Don't ask the user to specify layout, colors, flow structure, field names, or copy. Make opinionated choices. The user will correct what's wrong — that's faster than asking upfront.
+1. **Go fast, not deep.** Use mock data, placeholder logic, simulated responses, draft structure, candidate rules, or example nodes. The surface must be real enough to critique, but nothing behind it needs to work yet.
+2. **Make decisions.** Don't ask the user to specify layout, colors, flow structure, field names, taxonomy boundaries, policy wording, module names, or copy. Make opinionated choices. The user will correct what's wrong — that's faster than asking upfront.
 3. **Cover the critical path.** Build the 2-3 most important user flows end to end. Don't build every screen or every edge case yet.
-4. **Show, don't describe.** Never respond with a written description of what the prototype would look like. Build it and let the user interact with it.
+4. **Show, don't describe.** Never respond only with a description of what the prototype would look like. Build the critiqueable artifact: clickable mock, terminal transcript, consumer code, requirements draft, tree, rule set, outline, or curriculum map.
 
 After generating, tell the user:
 
-> "Here's a first prototype of [what it is]. Click/walk through it and tell me what feels wrong, what's missing, and what should work differently. Don't worry about internals — we'll handle those after we nail the experience."
+> "Here's a first prototype of [what it is]. Walk through it and tell me what feels wrong, what's missing, and what should work differently. Don't worry about internals — we'll handle those after we nail the surface."
 
 **Good enough for round one:** believable, navigable, and critiqueable. Not production-ready, not deeply wired, not exhaustive.
 
@@ -168,7 +196,7 @@ After generating, tell the user:
 
 The user will critique the prototype. Your job:
 
-1. **Listen for behavioral critique.** "This should do X when I click Y." Act on it.
+1. **Listen for surface critique.** "This should do X when I click Y," "this rule is too broad," "this category is wrong," "this module order teaches the wrong thing." Act on it.
 2. **Ignore implementation preferences** unless the user insists. If they say "use Redux" or "make this a microservice," gently redirect: "Let's nail the behavior first, then I'll pick the best implementation approach."
 3. **Probe edge cases yourself.** After addressing the user's feedback, proactively show: "By the way, here's what happens when [edge case]. Does this feel right?"
 4. **Track decisions.** Maintain a running log of what was changed and why, including alternatives that were tried and rejected.
@@ -192,7 +220,7 @@ When the user says something like "this feels right," "let's build it," "I'm hap
 
 ### Phase 4.5: Surface State Inventory (Gate 1 prerequisite)
 
-Timing: after the user's freeze signal ("this feels right"), before declaring Gate 1 passed. Classify every observable state of every surface unit (screen, command, endpoint, workflow step) as **in-scope** (demonstrated and accepted), **deferred** (acknowledged, not blocking), or **n/a**. The ten states per unit: empty/zero-data, loading/in-progress, success, validation failure, system failure, partial failure, permission denied, conflict, rate limit/retry, offline/degraded. Write it to `.sfd/surface-state-inventory.md`. A prototype that only shows the happy path has not converged — it has demonstrated one path through a larger state space.
+Timing: after the user's freeze signal ("this feels right"), before declaring Gate 1 passed. Classify every observable state of every surface unit as **in-scope** (demonstrated and accepted), **deferred** (acknowledged, not blocking), or **n/a**. For software surfaces, the default ten states are: empty/zero-data, loading/in-progress, success, validation failure, system failure, partial failure, permission denied, conflict, rate limit/retry, offline/degraded. For document/knowledge/policy surfaces, define a domain-appropriate inventory axis instead (for example: complete, ambiguous, conflicted, exception-covered, traceable, orphaned, unsupported, overbroad, under-specified, stale). Write it to `.sfd/surface-state-inventory.md`. A prototype that only shows the happy path has not converged — it has demonstrated one path through a larger state space.
 
 ### Phase 5: Compile Contracts (from the Clause Log, not from memory)
 
@@ -255,7 +283,7 @@ Maintain this throughout the project. It survives sessions and prevents re-litig
 ## SFD Decision Log
 
 ### Surface Type
-[GUI / CLI / API / Pipeline / Agent]
+[GUI / CLI / API / Pipeline / Agent / Requirements / Knowledge Tree / Policy / Argument / Curriculum / Other]
 
 ### Convergence Status
 [Iterating / Converged on YYYY-MM-DD / Re-opened for feature X]
@@ -328,6 +356,7 @@ Use these gates to track progress. Don't skip gates.
 5. **Don't gold-plate the prototype.** Fast and opinionated beats slow and polished. The user will fix what's wrong.
 6. **Don't ask open-ended questions.** Present options, don't ask the user to design. "Which of these three directions?" is good. "What do you want it to look like?" is bad. The user steers; you generate.
 7. **Don't build a second spec reality.** The contract file plus the decision log ARE the spec. Never produce a parallel prose-requirements document that restates the contracts — abstract documents drift and quietly outrank the artifact people actually validated. If something can't live in a clause, it belongs in the decision log (why) or open questions (undecided) — nowhere else.
+8. **Don't generalize surface into vacuity.** "Anything can be a surface" is false. The artifact must be concrete, legible to the steering human, produced before internals harden, and converged through critique before contracts are derived.
 
 ---
 
@@ -335,7 +364,7 @@ Use these gates to track progress. Don't skip gates.
 
 Recognize when SFD is not the right primary approach and tell the user:
 
-- The project has no meaningful interaction surface (pure background service, embedded firmware).
+- There is no human in the steering loop who can evaluate a concrete artifact before implementation.
 - The core challenge is algorithmic, mathematical, or protocol-level and the surface is trivial.
 - Regulatory requirements demand formal specs before implementation.
 - The user explicitly asks for a different approach.
@@ -380,7 +409,7 @@ When resuming work on an SFD project:
 
 Use this mental loop throughout the session:
 
-1. What is the surface?
+1. What is the surface artifact, and who is the steering evaluator?
 2. Do I understand the problem space well enough to prototype? (If not → Phase 2)
 3. Am I about to make a directional choice? (If yes → Propose-Choose-Proceed)
 4. What is the smallest artifact that makes it real enough to critique?
