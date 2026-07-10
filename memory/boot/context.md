@@ -43,6 +43,21 @@ Full provenance pointers in `docs/concepts/00`, bottom section.
 The GPT-Pro pressure points (inbox IN-20260612-7d2c) remain amendment
 candidates for later — plans build against the concepts as approved.
 
+**PIVOT (2026-06-15, owner's decision — DC-0003):** external review of
+`signalridge/slipway` (mature Go lifecycle-governance CLI) concluded Slipway
+has won the lifecycle-governor niche Plan 2 was reaching for. Plan 2's
+courtroom is cut — building it would make docket a worse Slipway. Docket
+narrows to its distinct thesis (portable contract + Accord door policy +
+producer/consumer decoupling) and Slipway is reframed as docket's *consumer*,
+not competitor. **SUPERSEDED same-session by DC-0004:** the "retire/narrow" conclusion
+evolved — docket didn't die, it moved a level higher to **agent-harness
+CI/CD** (governed promotion of self-improving agent runtimes; skills are
+the natural-language applications). docket = policy layer; Caliper (the
+LLM-as-judge firewall Claude sketched today) = sensor/moat; Slipway =
+lifecycle; Proofroom = verifier independence. Plan 2's courtroom stays
+cut (still redundant with Slipway). Next: run Caliper's κ-gate falsifier,
+not compose. docket is agent-owned (Claude's call); Pyro is infra + contributor.
+
 **Next steps:**
 1. ~~Concept review~~ DONE — approved by Pyro 2026-06-12.
 2. ~~KG hygiene~~ DONE 2026-06-12 night: `sketches/docket.md` +
@@ -63,13 +78,28 @@ candidates for later — plans build against the concepts as approved.
    ledger-wide A5, all-refused reports cite checks, file clause-mismatch
    refused). Door also grew cross-contract A7 (clause ids per-project
    monotonic — concepts/01's own rule, now mechanical).
-5. Execute plan 2 (courtroom: review/amend/sign + recursive fixture) —
-   FRESH SESSION recommended. Carry-ins for Plan 2: verdict.bundle stores
-   filename STEM (pinned in state.py comment); D0-004 surface test should
-   cover stale/stuck footers too (Codie nit); sign gate must honor the
-   runner trust model (signature is the boundary).
-6. Recursive fixture green → Pyro signs rev1 → falsifier run on tipsy's
-   signed bundle (four refutation conditions).
+5. ~~Execute plan 2 (courtroom)~~ DEFERRED INDEFINITELY (DC-0003, 2026-06-15):
+   Slipway ships the lifecycle-governance side better than docket would. The
+   courtroom is cut, not paused — review/amend/sign reproduce Slipway.
+   Carry-ins above stay on ice in case the distinct-thesis direction ever
+   needs a write-side of its own.
+6. ~~Seam hunt~~ DONE 2026-06-15 (DC-0003 UPDATE). Slipway machine-validates
+   its requirements layer (REQ-NNN + GIVEN/WHEN/THEN + traceability, in the
+   engine, fail-closed). No external-obligation-import seam exists. The
+   docket ledger has no consumer Slipway doesn't already serve → portable-
+   ledger thesis largely refuted. Docket's surviving value = provenance
+   anchors + RFC-2119 admission discipline (A4/A6/A8/A9) + external-authority
+   production mode. Natural bridge is producer-side: contract-first skill
+   emits Slipway-native requirements.md, not docket .contract.yaml.
+7. **RESOLVED 2026-06-15 (DC-0004):** none of (a/b/c) — docket reframed as
+   the **policy layer of agent-harness CI/CD**, not retired. The governed
+   artifact is the agent runtime (skills/prompts/tools/judges); skills are
+   the natural-language applications. docket's door+contracts = policy;
+   Caliper = the evaluator firewall / sensor (the moat — already prototyped);
+   Slipway = lifecycle; Proofroom = verifier independence. Plan 2 courtroom
+   stays cut (redundant with Slipway). Next real step: run Caliper's κ-gate
+   falsifier on one real skill (contract-first routing) — prove the sensor
+   before composing the integration. Owner: Claude; Pyro is contributor + infra.
 
 **Related vault material (claude-knowledge):** capture
 `2026-06-12-sfd-produces-contracts-not-specs-three-way-convergence` (queued,
