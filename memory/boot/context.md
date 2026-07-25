@@ -91,15 +91,46 @@ not compose. docket is agent-owned (Claude's call); Pyro is infra + contributor.
    anchors + RFC-2119 admission discipline (A4/A6/A8/A9) + external-authority
    production mode. Natural bridge is producer-side: contract-first skill
    emits Slipway-native requirements.md, not docket .contract.yaml.
-7. **RESOLVED 2026-06-15 (DC-0004):** none of (a/b/c) — docket reframed as
-   the **policy layer of agent-harness CI/CD**, not retired. The governed
-   artifact is the agent runtime (skills/prompts/tools/judges); skills are
-   the natural-language applications. docket's door+contracts = policy;
-   Caliper = the evaluator firewall / sensor (the moat — already prototyped);
-   Slipway = lifecycle; Proofroom = verifier independence. Plan 2 courtroom
-   stays cut (redundant with Slipway). Next real step: run Caliper's κ-gate
-   falsifier on one real skill (contract-first routing) — prove the sensor
-   before composing the integration. Owner: Claude; Pyro is contributor + infra.
+7. ~~**RESOLVED 2026-06-15 (DC-0004):**~~ docket reframed as the **policy layer
+   of agent-harness CI/CD**, gated on Caliper's κ-gate falsifier.
+   **SUPERSEDED 2026-07-26 by DC-0005** — the premise came from the 06-15 seam
+   hunt (whose falsifier could not fail), and the κ-gate instrument was retired
+   by its own author on 2026-06-16 without write-back. Harness layer is not
+   revived; it must be re-earned after the code falsifier answers.
+
+---
+
+## CURRENT STATE (2026-07-26, DC-0005) — read this first
+
+**Docket is resumed as a contract-and-evidence kernel, scoped to one question:
+does a contract outlive the changes that satisfy it?** Not a lifecycle
+framework. Not the harness layer (yet). See `memory/decisions/DC-0005-*`.
+
+Reversing a badly-reasoned stop is not a green light — there is still **zero**
+evidence the thesis holds. The resume exists to produce that evidence or kill
+the project honestly, against kill conditions that can actually fire (DC-0005).
+
+**Repo shape (2026-07-26):** `main` fast-forwarded from the founding-day state
+to db1b1df — it now carries the implementation and is the trunk. The research
+state is frozen at tag `research/v0-sfd-1-baseline`. `v0` is a dead-end sibling
+with nothing unique. Work happens on branches off `main`.
+
+**73 tests pass — do not read that as correctness.** Six trust defects are
+confirmed against source; two of them (partial import weakening the law,
+accepted-verdict false clear) are *pinned by the current suite*, so the tests
+protect the wrong behavior. Baseline, not correctness.
+
+**Two false statements must be repaired before any experiment runs:**
+- `docket sign` does not exist. Signing was Plan 2; Plan 2 was cut. The runner
+  docstring and `render.py:118` both assert a signature trust boundary that
+  cannot be reached. All law in the system is unsigned, and the runner executes
+  its commands via `shell=True` bash.
+- The contract-first skill teaches four anchor types the door refuses
+  (`test`, `policy`, `legacy`, `regulation-section` vs the runtime's six).
+  Verified by execution: `[A7] schema: Extra inputs are not permitted`.
+  **That skill graduated its dojo without its output ever passing the door** —
+  the dojo tested routing, not admissibility. "Many horses, one door" and the
+  second horse was never walked through.
 
 **Related vault material (claude-knowledge):** capture
 `2026-06-12-sfd-produces-contracts-not-specs-three-way-convergence` (queued,

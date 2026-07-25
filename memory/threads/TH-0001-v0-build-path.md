@@ -2,12 +2,33 @@
 id: TH-0001
 title: "v0 build path — review gate, KG crossings, plan, fixture, falsifier"
 type: thread
-status: active
+status: closed
 trust: working
 scope: project
 created: '2026-06-12'
-updated: '2026-06-12'
+updated: '2026-07-26'
 ---
+
+> **CLOSED 2026-07-26 (DC-0005).** This thread tracked the v0 build path
+> through Plan 2 (courtroom) and its falsifier. Plan 2 was cut on 06-15 and
+> stays cut. What survives is re-derived into DC-0005's scoped experiment, not
+> carried forward from here:
+> - **tipsy's signed bundle as the fulfillment-run candidate** → superseded;
+>   DC-0005 uses a two-change run (A then B) over one contract, because the
+>   question is now clause survival across changes, not a single fulfillment.
+> - **mdtodo as the golden import fixture** → survives, and is the intended
+>   canonical fixture for the DC-0005 experiment.
+> - **The guardian-Goodharting / hollow-oracle watch item** → survives and
+>   sharpens: defect 1 (`command.expect` never enforced, exit 0 is green) is a
+>   *live instance* of the hollow oracle, found in our own runner. The
+>   pre-registered response — "door extends to evidence admission" — is now
+>   part of DC-0005's scope rather than a hypothetical.
+> - **grill-me / grill-with-docs integration** → not revived; producer-side
+>   work is out of scope until the kernel question answers.
+> - **GPT-Pro's five pressure points** (IN-20260612-7d2c) → still open
+>   amendment candidates; the signed-vs-pre-signing provenance mismatch is
+>   subsumed by DC-0005's approval/digest work.
+> Everything below is preserved as the reasoning trail.
 
 ~~Open gate: Pyro has not yet reviewed/signed the four concept docs (notably
 the v0 scope cut in docs/concepts/03).~~ **GATE CLOSED 2026-06-12 late

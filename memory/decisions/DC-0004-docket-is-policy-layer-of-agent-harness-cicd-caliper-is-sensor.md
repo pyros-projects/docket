@@ -9,6 +9,17 @@ created: '2026-06-15'
 updated: '2026-06-15'
 ---
 
+> **SUPERSEDED 2026-07-26 by DC-0005.** Two defects, both found on review:
+> (1) this decision's premise — "docket's ledger has no code-governance
+> consumer" — came from the 06-15 seam hunt, whose falsifier could not fail by
+> construction, so the premise was never established; (2) it gated itself on
+> Caliper's κ-gate, which its own author deprioritized on 2026-06-16 in the
+> Dimensions inception session and which Codie recorded as absorbed by
+> Dimensions on 2026-07-10 — neither write-back reached this repo, so this
+> decision has been blocking on a retired instrument. The agent-harness framing
+> may still be correct; it must be re-earned after the code falsifier answers,
+> not inherited. Read DC-0005 for current direction; read this for the frame.
+
 2026-06-15. Same session as DC-0003, a few turns later. Pyro reframed:
 docket didn't die — it moves a level higher. The real artifact class
 isn't code obligations, it's **natural-language applications — agent

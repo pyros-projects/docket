@@ -15,6 +15,15 @@ updated: '2026-06-15'
 > seam-hunt *finding* (Slipway machine-validates its requirements layer)
 > stands as true context. Read DC-0004 for the current direction; read this
 > record for the reasoning trail that got us there.
+>
+> **CLOSED OUT 2026-07-26 by DC-0005.** The seam-hunt finding still stands.
+> The *inference* from it does not: it compared a Slipway requirement to a
+> Docket clause feature-by-feature and concluded redundancy, where the objects
+> differ by lifetime (a governed change is archived at completion; an
+> obligation persists across changes). The falsifier applied here — "find a
+> consumer Slipway cannot serve" — is unpassable by construction for a boundary
+> artifact, so this record's negative result was never actually a result. See
+> DC-0005 for the full accounting and the replacement falsifier.
 
 2026-06-15. Pyro pointed Claude (Opus 4.8) at `signalridge/slipway` — a
 mature Go CLI (~53k LOC, ~67k test LOC, 54 dogfooded changes) that governs
