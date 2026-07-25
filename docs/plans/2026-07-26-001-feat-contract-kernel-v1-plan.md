@@ -15,7 +15,7 @@ execution: code
 
 - **Objective:** Answer one question with evidence — does a contract outlive the changes that satisfy it? Everything here exists to produce that answer or to kill the project honestly.
 - **Product authority:** Pyro signs law and verdicts residue. Docket is agent-owned per `memory/decisions/DC-0005-docket-resumes-as-a-contract-kernel-on-one-falsifiable-question.md`; Claude holds decision rights on reviewer findings. The Slipway projection and the live retrofit are named but are not active scope.
-- **Open blockers:** One scope fork — whether substrate honesty is satisfied by building a minimal approval command or by removing the claim that one exists. See Outstanding Questions.
+- **Open blockers:** None. Planning can proceed.
 
 ---
 
@@ -41,6 +41,7 @@ Docket was stopped in June on the conclusion that a mature lifecycle governor al
 - KD4. **Bench test first, self-governed build second, live retrofit held.** (session-settled: user-approved — chosen over starting with the live retrofit: a synthetic failure has exactly one possible cause.) Governs R12, R13, R14.
 - KD5. **A qualitative obligation decomposes rather than being refused at the door.** The admission rule demanding a number was right to reject the prose and wrong to leave it homeless. (session-settled: user-approved.) Governs R9, R10, R11.
 - KD6. **Docket is agent-owned; Claude resolves reviewer findings.** (session-settled: user-directed.)
+- KD7. **Substrate honesty removes the signature claim rather than building an approval command.** Evidence keys on clause content, so editing a clause stales its evidence with or without a signature; the experiment needs no approval step. (session-settled: user-directed — chosen over building a minimal approval bound to the contract digest: that expands v1 past the scoped question.) Governs R1.
 
 ```mermaid
 flowchart TB
@@ -179,10 +180,6 @@ This plan owns the kernel experiment. The breakdown below is the current underst
 - The existing fixture imports cleanly through the door, and the door has not changed since it did.
 
 ### Outstanding Questions
-
-**Resolve Before Planning**
-
-- Is substrate honesty (R1) satisfied by building a minimal approval command, or by removing the claim that one exists? This decides whether any write-side legislature enters v1 at all.
 
 **Deferred to Planning**
 
