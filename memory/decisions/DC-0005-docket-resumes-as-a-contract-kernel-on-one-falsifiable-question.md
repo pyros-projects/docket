@@ -188,6 +188,25 @@ Slipway evidence ingestion · Caliper-specific schema fields. The evidence schem
 should be generic enough to ingest an evaluator later; no evaluator shapes the
 kernel before the code falsifier passes.
 
+**AMENDED 2026-07-26** after the external review
+(`docs/reviews/2026-07-26-codie-external-review-contract-kernel-v1.md`): the run
+needs two write operations this decision's cut left absent. Change B requires a
+clause amendment and the residue requires a verdict, and with neither in the CLI
+the implementer would hand-edit contract YAML and history JSON — bypassing the
+admission and provenance behaviour the experiment exists to measure. A narrow
+validated `amend` and `verdict` path enters scope as an experiment fixture only:
+no review workflow, no queues, no signing, no second definition of done. The
+courtroom stays cut. If the kernel question answers "no", these two operations
+retire with the rest.
+
+The same review established that the plan as first written could report a "go"
+without the thesis being true — a global evidence subject stales every clause on
+any change, so re-running checks manufactures fresh records that read as
+carry-forward. That is the same class of defect this decision was written to
+correct in the June stop: a test that cannot produce the result it claims to
+produce. It was caught before execution rather than after, which is the only
+reason it is a correction and not a repeat.
+
 ## Provenance
 
 - External review: GPT-Pro shared conversation, "Spec-driven Frameworks
